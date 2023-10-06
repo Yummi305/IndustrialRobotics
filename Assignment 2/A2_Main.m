@@ -16,28 +16,28 @@ brickFunctions = BrickFunctions();
 
 
 %% Setup environment
-clf; % Clear point cloud
-clc; % Clear command window
-axis([-4, 2, -3, 2, 0.01, 4]);
+axis([-3, 3, -3, 3, 0.01, 3]);
 % axis equal;
 hold on
 
 %% hey dennis
 
 % Read environment textures
- floor = imread ('grassFloor.png'); % Floor Image
- wall = imread ('forest.jpg'); % Wall Image
+ floor = imread ('animal_crossing__grass.jpg'); % Floor Image
+%  wall = imread ('forest.jpg'); % Wall Image
 
 % Floor
- surf([-4,-4;2,2],[-3,2;-3,2],[0.01,0.01;0.01,0.01],'CData',floor,'FaceColor','texturemap'); 
+ surf([-6.5,-6.5;7,7],[-5,5;-5,5],[0.01,0.01;0.01,0.01],'CData',floor,'FaceColor','texturemap'); 
 
  hold on
 % Walls 
 %  surf([-4,2;-4,2],[2,2;2,2],[0,0;4,4],'CData',wall,'FaceColor','texturemap'); % Back wall
- surf([2,2;2,2],[-3,2;-3,2],[4,4;0,0],'CData',wall,'FaceColor','texturemap'); % Side wall
+%  surf([2,2;2,2],[-3,2;-3,2],[4,4;0,0],'CData',wall,'FaceColor','texturemap'); % Side wall
 
 %% Setup equipment
 
+PlaceObject('HalfSizedRedGreenBrick.ply',[1,-1,0]);
+PlaceObject('OrangeColoured.ply',[1.2,-1,0]);
 
 %% Generate LinearUR3
 % Initialise LinearUR3
