@@ -36,12 +36,13 @@ hold on
 
 %% Setup equipment
 
-PlaceObject('HalfSizedRedGreenBrick.ply',[1,-1,0]);
-PlaceObject('OrangeColoured.ply',[1.2,-1,0]);
+% PlaceObject('HalfSizedRedGreenBrick.ply',[1,-1,0]);
+% PlaceObject('OrangeColoured.ply',[1.2,-1,0]);
 
 %% Generate LinearUR3
 % Initialise LinearUR3
 BrickBot = LinearUR3(transl(0,0,0));
+PlaceObject('TreeNormal.ply',[0,1.5,0]);
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
