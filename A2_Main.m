@@ -22,6 +22,8 @@ axis([-4, 2, -3, 2, 0.01, 4]);
 % axis equal;
 hold on
 
+%% hey dennis
+
 % Read environment textures
  floor = imread ('grassFloor.png'); % Floor Image
  wall = imread ('forest.jpg'); % Wall Image
