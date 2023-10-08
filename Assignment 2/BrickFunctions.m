@@ -24,7 +24,7 @@ classdef BrickFunctions
                     % Update the object's position and orientation
                     set(objectArray{i}, 'Vertices', vertsTransform(:, 1:3));
                 else
-                    objectTemp = PlaceObject(objectName, 0,0,0);
+                    objectTemp = PlaceObject(objectName, positionMatrix(i,:));
                     % Compute the transformation
                     verts = [get(objectTemp, 'Vertices'), ones(size(get(objectTemp, 'Vertices'), 1), 1)];
                     % Update the object's position and orientation
