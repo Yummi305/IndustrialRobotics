@@ -8,7 +8,7 @@ close all;
 robotFunctions = RobotFunctions();
 
 %% Create instance of Brick Functions Class in order to access functions
-brickFunctions = BrickFunctions();
+objFunc = ObjectFunctions();
 
 %% Dimensions / Constants
 
@@ -38,47 +38,33 @@ hold on
 tree_position = [-0.4, 0.6, 0; 
                  -1.2, 0.6, 0];
 
-% % Unripe Orange & Location Container
-% unripe_initial = [-0.4, 0, 0.5; 
-%                   -1.1, 0, 0.5];
-% unripe_object = cell(1, size(unripe_initial, 1));
-% unripe_verts = cell(1, size(unripe_initial, 1));
+% Tree 1 Orange Locations
+tree1_pos = [-0.4, 0.3, 0.5; 
+              -0.6, 0.33, 0.4; 
+              -0.5, 0.35, 0.6; 
+              -0.6, 0.35, 0.51];
+tree1_obj = cell(1, size(tree1_pos, 1));
+tree1_verts = cell(1, size(tree1_pos, 1));
 
-% Ripe Orange & Location Container
-ripe_initial = [-0.4, 0.3, 0.5; 
-                -0.6, 0.33, 0.4; 
-                -0.5, 0.35, 0.6; 
-                -1.1, 0.3, 0.35;
-                -1.15, 0.3, 0.54
-                -0.9, 0.4, 0.5
-                ]; % i = 1 - 3, tree 1
-                   % i = 4 - 6, tree 2
-ripe_object = cell(1, size(ripe_initial, 1));
-ripe_verts = cell(1, size(ripe_initial, 1));
-
-% Overripe Orange & Location Container
-overripe_initial = [-0.6, 0.35, 0.51; 
-                   -1, 0.4, 0.55
-                   -1.25, 0.26, 0.45
-                   ]; % i = 1, tree 1
-                      % i = 2 - 3, tree 2
-overripe_object = cell(1, size(overripe_initial, 1));
-overripe_verts = cell(1, size(overripe_initial, 1));
-
+% Tree 2 Orange Locaitons
+tree2_pos = [-1.1, 0.3, 0.35;
+              -1.15, 0.3, 0.54;
+              -0.9, 0.4, 0.5;
+              -1, 0.4, 0.55;
+              -1.25, 0.26, 0.45];
+tree2_obj = cell(1, size(tree2_pos, 1));
+tree2_verts = cell(1, size(tree2_pos, 1));
 
 %% Initialise objects
 
 % Trees
-brickFunctions.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
+objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
 
-% Unripe Oranges
-% brickFunctions.PlaceManyObjects('Orange_UnRipe.ply',unripe_initial, true, unripe_object, unripe_verts);
+% Tree 1's oranges
+objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree1_pos,tree1_obj,tree1_verts);
 
-% Ripe Oranges
-brickFunctions.PlaceManyObjects('Orange_ripe.ply',ripe_initial, true, ripe_object, ripe_verts);
-
-% Overripe Oranges
-brickFunctions.PlaceManyObjects('Orange_OverRipe.ply',overripe_initial, true, overripe_object, overripe_verts);
+% Tree 2's oranges
+objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
 
 %% Initialise equipment
 
