@@ -38,7 +38,7 @@ hold on
 tree_position = [-0.4, 0.6, 0; 
                  -1.2, 0.6, 0];
 
-% Tree 1 Orange Locations
+% Tree 1 Orange Initial Locations
 tree1_pos = [-0.4, 0.3, 0.5; 
               -0.6, 0.33, 0.4; 
               -0.5, 0.35, 0.6; 
@@ -46,7 +46,13 @@ tree1_pos = [-0.4, 0.3, 0.5;
 tree1_obj = cell(1, size(tree1_pos, 1));
 tree1_verts = cell(1, size(tree1_pos, 1));
 
-% Tree 2 Orange Locaitons
+% Tree 1 Orange Crate Locations
+tree1_crate_pos = [-1.0,-0.5,0.01; 
+                   -1.0,-0.5,0.01; 
+                   -1.0,-0.5,0.01; 
+                   -1.0,-0.5,0.01];
+
+% Tree 2 Orange Initial Locaitons
 tree2_pos = [-1.1, 0.3, 0.35;
               -1.15, 0.3, 0.54;
               -0.9, 0.4, 0.5;
@@ -54,6 +60,13 @@ tree2_pos = [-1.1, 0.3, 0.35;
               -1.25, 0.26, 0.45];
 tree2_obj = cell(1, size(tree2_pos, 1));
 tree2_verts = cell(1, size(tree2_pos, 1));
+
+% Tree 2 Orange Crate Locaitons
+tree2_crate_pos = [-1.0,-0.5,0.01; 
+                   -1.0,-0.5,0.01; 
+                   -1.0,-0.5,0.01; 
+                   -1.0,-0.5,0.01;
+                   -1.0,-0.5,0.01];
 
 %% Initialise objects
 
@@ -79,15 +92,30 @@ PlaceObject('crate.ply',[-0.2,-0.5,0.01]);
 
 %% Generate LinearUR3
 % Initialise LinearUR3
-BrickBot = LinearUR3(transl(0,0,0.01));
+harvestBot = LinearUR3(transl(0,0,0.01));
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
 
 
-%% Begin Planting
+%% Begin Picking
 display(['Beginning planting process.']);
 
+for x = 1:size(tree1_pos, 1)
+    % Move to initial brick location
+    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2),tree1_pos(x,3)+0.1],50,0,false,0);
+
+    % Pick up oranges
+
+    % Move oranges away from tree
+
+    % Move oranges to crate
+
+    % Place oranges in crate
+
+    % Release gripper
+
+end
 
 %% End of program
 display(['Planting process completed.']);
