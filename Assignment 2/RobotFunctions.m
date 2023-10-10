@@ -2,11 +2,16 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingBrick, vertices)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingBrick, vertices, picking)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
+            if (picking)
+                endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
+            else
+                endMove = transl(position) * trotx(pi); % To position end effector to point towards z axis in negative direction
+            end
+
             q0 = robot.model.getpos();
-            endMove = transl(position) * trotx(pi);
             pose = robot.model.fkine(q0);
             q1 = robot.model.ikcon(pose, q0);
             q2 = robot.model.ikcon(endMove, q0);
