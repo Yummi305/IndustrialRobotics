@@ -151,7 +151,7 @@ for x = 1:size(tree1_pos, 1)
 
 
     % Lift End Effector from crate
-    display(['Tree 1 Harvest: Place orange ', num2str(x), ' within the crate.']);
+    display(['Tree 1 Harvest: Lift gripper ', num2str(x), ' from the crate.']);
     robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)+0.5],50,0,false,0,2);
 
     % Count orange picked.
@@ -160,6 +160,8 @@ for x = 1:size(tree1_pos, 1)
 end
 
 display(['Tree 1 Harvest: Completed.']);
+display(['=====================================']);
+
 
 %% Harvest Tree 2
 display(['Tree 2 Harvest: Beginning picking process.']);
@@ -192,7 +194,7 @@ for j = 1:size(tree2_pos, 1)
     % Release gripper
 
     % Lift End Effector from crate
-    display(['Tree 2 Harvest: Place orange ', num2str(j), ' within the crate.']);
+    display(['Tree 2 Harvest: Lift the gripper ', num2str(j), ' from the crate.']);
     robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,0,false,0,2);
 
     % Count orange picked.
