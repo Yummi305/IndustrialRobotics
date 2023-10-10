@@ -41,8 +41,8 @@ tree_position = [-0.4, 0.6, 0;
 % Tree 1 Orange Initial Locations
 tree1_pos = [-0.4, 0.3, 0.5; 
              -0.6, 0.33, 0.4; 
-             -0.5, 0.35, 0.6; 
-             -0.6, 0.35, 0.51];
+             -0.5, 0.3, 0.6; 
+             -0.6, 0.3, 0.51]; %3,4issue
 
 % Store orange objects and vertices
 tree1_obj = cell(1, size(tree1_pos, 1));
@@ -95,25 +95,25 @@ tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 1;
 objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
 
 % Tree 1's oranges
-objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree1_pos,tree1_obj,tree1_verts);
+[tree1_obj,tree1_verts] = objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree1_pos,tree1_obj,tree1_verts);
 
 % Tree 2's oranges
-objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
+[tree2_obj,tree2_verts] = objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
 
 %% Initialise equipment
 
 % unsorted crate
-PlaceObject('crate.ply',[-1.0,-0.4,0.01]);
+PlaceObject('crate.ply',[-1.0,-0.45,0.01]);
 
 % Ripe Oranges crate
-PlaceObject('crate.ply',[-0.6,-0.4,0.01]);
+PlaceObject('crate.ply',[-0.6,-0.45,0.01]);
 
 % Overripe Oranges crate
-PlaceObject('crate.ply',[-0.2,-0.4,0.01]);
+PlaceObject('crate.ply',[-0.2,-0.45,0.01]);
 
 %% Generate LinearUR3
 % Initialise LinearUR3
-harvestBot = LinearUR3(transl(0,0,0.01));
+harvestBot = LinearUR3(transl(0,0,0.02));
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
@@ -123,35 +123,42 @@ harvestBot = LinearUR3(transl(0,0,0.01));
 display(['Tree 1 Harvest: Beginning picking process.']);
 o1_n = 0; % Orange harvest count
 
-for x = 1:2 %size(tree1_pos, 1)
+for x = 1:size(tree1_pos, 1)
+
     % Look for orange
     display(['Tree 1 Harvest: Look for orange ', num2str(x)]);
-    robotFunctions.MoveRobot(harvestBot,[-0.4, 0.1, 0.4],30,0,false,0,true);
-
+    robotFunctions.MoveRobot(harvestBot,[-0.5, 0.1, 0.5],50,0,false,0,1);
+    
     % Move to initial orange location
     display(['Tree 1 Harvest: Go to orange ', num2str(x)]);
-    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2),tree1_pos(x,3)],50,0,false,0,true);
+    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2),tree1_pos(x,3)],50,0,false,0,1);
 
     % Gripper grasp orange
 
     % Move oranges away from tree
     display(['Tree 1 Harvest: Pick orange ', num2str(x), ' from tree.']);
-    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2)-0.2,tree1_pos(x,3)],50,0,false,0,false);
+    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2)-0.2,tree1_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
 
     % Move oranges above crate
     display(['Tree 1 Harvest: Place orange ', num2str(x), ' above crate.']);
-    robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)+0.5],50,0,false,0,false);
+    robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)+0.5],50,tree1_obj{x},true,tree1_verts{x},2);
 % 
     % Place oranges in crate
     display(['Tree 1 Harvest: Place orange ', num2str(x), ' within the crate.']);
-    robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)],50,0,false,0,false);
+    robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
 
     % Release gripper
+
+
+    % Lift End Effector from crate
+    display(['Tree 1 Harvest: Place orange ', num2str(x), ' within the crate.']);
+    robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)+0.5],50,0,false,0,2);
 
     % Count orange picked.
     o1_n = o1_n + 1;
     display(['Tree 1 Harvest: The total number of oranges picked from tree 1 is ', num2str(x)]);
 end
+
 display(['Tree 1 Harvest: Completed.']);
 
 %% Harvest Tree 2
@@ -159,31 +166,42 @@ display(['Tree 2 Harvest: Beginning picking process.']);
 o2_n = 0; % Orange harvest count
 
 for j = 1:size(tree2_pos, 1)
+
+    % Look for orange
+    display(['Tree 2 Harvest: Look for orange ', num2str(x)]);
+    robotFunctions.MoveRobot(harvestBot,[-1.1, 0.1, 0.5],50,0,false,0,1);
+
     % Move to initial brick location
     display(['Tree 2 Harvest: Go to orange ', num2str(j)]);
-    robotFunctions.MoveRobot(harvestBot,[tree2_pos(j,1),tree2_pos(j,2),tree2_pos(j,3)],50,0,false,0,true);
+    robotFunctions.MoveRobot(harvestBot,[tree2_pos(j,1),tree2_pos(j,2),tree2_pos(j,3)],50,0,false,0,1);
 
     % Gripper grasp orange
 
     % Move oranges away from tree
     display(['Tree 2 Harvest: Pick orange ', num2str(j), ' from tree.']);
-    robotFunctions.MoveRobot(harvestBot,[tree2_picked(j,1),tree2_picked(j,2),tree2_picked(j,3)],50,0,false,0,true);
+    robotFunctions.MoveRobot(harvestBot,[tree2_picked(j,1),tree2_picked(j,2),tree2_picked(j,3)],50,tree2_obj{j},true,tree2_verts{j},1);
 
     % Move oranges to crate
     display(['Tree 2 Harvest: Place orange ', num2str(j), ' above crate.']);
-    robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,0,false,0,false);
+    robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,tree2_obj{j},true,tree2_verts{j},2);
 
     % Place oranges in crate
     display(['Tree 2 Harvest: Place orange ', num2str(j), ' within the crate.']);
-    robotFunctions.MoveRobot(harvestBot,[tree2_crate_pos(j,1),tree2_crate_pos(j,2),tree2_crate_pos(j,3)],50,0,false,0,false);
+    robotFunctions.MoveRobot(harvestBot,[tree2_crate_pos(j,1),tree2_crate_pos(j,2),tree2_crate_pos(j,3)],50,tree2_obj{j},true,tree2_verts{j},2);
 
     % Release gripper
+
+    % Lift End Effector from crate
+    display(['Tree 2 Harvest: Place orange ', num2str(j), ' within the crate.']);
+    robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,0,false,0,2);
 
     % Count orange picked.
     o2_n = o2_n + 1;
     display(['Tree 2 Harvest: The total number of oranges picked from tree 2 is ', num2str(o2_n)]);
 end
 
+% Return Robot to beginning.
+robotFunctions.MoveRobot(harvestBot,[-0.2, 0, 0.65],75,0,false,0,3);
 
 %% End of program
 display(['Harvesting completed.']);
