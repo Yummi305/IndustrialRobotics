@@ -16,7 +16,7 @@ objFunc = ObjectFunctions();
 
 
 %% Setup environment
-axis([-2, 1, -1, 1, 0.01, 1.5]);
+axis([-1.7, 0.5, -1, 1.5, 0.01, 1.5]);
 % axis equal;
 hold on
 
@@ -32,10 +32,24 @@ hold on
 %  surf([-4,2;-4,2],[2,2;2,2],[0,0;4,4],'CData',wall,'FaceColor','texturemap'); % Back wall
 %  surf([2,2;2,2],[-3,2;-3,2],[4,4;0,0],'CData',wall,'FaceColor','texturemap'); % Side wall
 
-%% Trees
+%% Farm Environment
 % Tree Location Container
 tree_position = [-0.4, 0.6, 0; 
                  -1.2, 0.6, 0];
+
+%% Initialise Farm
+
+% Unsorted oranges crate
+PlaceObject('fruit_crate_unsorted.ply',[-1.0,-0.45,0.01]);
+
+% Ripe oranges crate
+PlaceObject('fruit_crate_ripe.ply',[-0.6,-0.45,0.01]);
+
+% Overripe oranges crate
+PlaceObject('fruit_crate_over_ripe.ply',[-0.2,-0.45,0.01]);
+
+% Trees
+objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
 
 %% Tree 1 Oranges
 % Tree 1 Orange Initial Locations
@@ -89,27 +103,13 @@ tree2_crate_pos = [-1.0,-0.5,0.01;
 tree2_above_crate = tree2_crate_pos;
 tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 1;
 
-%% Initialise objects
-
-% Trees
-objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
+%% Grow Fruit
 
 % Tree 1's oranges
 [tree1_obj,tree1_verts] = objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree1_pos,tree1_obj,tree1_verts);
 
 % Tree 2's oranges
 [tree2_obj,tree2_verts] = objFunc.GrowOranges('Orange_ripe.ply','Orange_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
-
-%% Initialise equipment
-
-% unsorted crate
-PlaceObject('crate.ply',[-1.0,-0.45,0.01]);
-
-% Ripe Oranges crate
-PlaceObject('crate.ply',[-0.6,-0.45,0.01]);
-
-% Overripe Oranges crate
-PlaceObject('crate.ply',[-0.2,-0.45,0.01]);
 
 %% Generate LinearUR3
 % Initialise LinearUR3
