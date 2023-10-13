@@ -83,7 +83,7 @@ tree2_verts = cell(1, size(tree2_pos, 1));
 tree2_picked = tree2_pos;
 tree2_picked(:, 2) = tree2_picked(:, 2) - 0.1;
 
-%% Crate Positions
+%% Unsorted Crate Positions
 % Tree 1 Orange Crate Locations
 tree1_crate_pos = [-0.55,-0.3,0.04; 
                    -0.65,-0.3,0.04; 
@@ -103,6 +103,27 @@ tree1_above_crate(:, 3) = tree1_above_crate(:, 3) + 0.8;
 % Tree 2 Orange above crate
 tree2_above_crate = tree2_crate_pos;
 tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 0.8;
+
+%% Sorted Crate Positions
+% Tree 1 Orange Sorted Crate Locations
+tree1_sorted_crate_pos = [-1.3,-0.6,0.04; 
+                          -1.3,-0.6,0.04; 
+                          -1.3,-0.6,0.04; 
+                          -1.3,-1.0,0.04];
+
+% Tree 2 Orange Sorted Crate Locations
+tree2_sorted_crate_pos = [-1.3,-0.6,0.04
+                          -1.3,-0.6,0.04; 
+                          -1.3,-0.6,0.04; 
+                          -1.3,-1.0,0.04];
+
+% Tree 1 Orange above sorted crate
+tree1_above_sorted_crate = tree1_sorted_crate_pos;
+tree1_above_sorted_crate(:, 3) = tree1_above_sorted_crate(:, 3) + 0.8;
+
+% Tree 2 Orange above sorted crate
+tree2_above_sorted_crate = tree2_sorted_crate_pos;
+tree2_above_sorted_crate(:, 3) = tree2_above_sorted_crate(:, 3) + 0.8;
 
 %% Grow Fruit
 
