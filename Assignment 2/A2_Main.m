@@ -10,13 +10,8 @@ robotFunctions = RobotFunctions();
 %% Create instance of Brick Functions Class in order to access functions
 objFunc = ObjectFunctions();
 
-%% Dimensions / Constants
-
-%% Initialise object locations
-
-
 %% Setup environment
-axis([-1.7, 0.5, -1.5, 1, 0.01, 1.5]);
+axis([-2.2, 1, -2, 1.2, 0.01, 1.5]);
 % axis equal;
 hold on
 
@@ -39,6 +34,21 @@ tree_position = [-0.4, 0.6, 0;
                   0.4, 0.6, 0];
 
 %% Initialise Farm
+
+% Safety Equipment
+% Guard rails to secure the zone from external hazards
+PlaceObject('fence.ply',[-1.4,1,0.01]);
+PlaceObject('fence.ply',[-0.15,1,0.01]);
+PlaceObject('fence.ply',[1.1,1,0.01]);
+
+% Safety cones
+PlaceObject('cone.ply',[-1.2,0,0.01]);
+PlaceObject('cone.ply',[0.5,0,0.01]);
+PlaceObject('cone.ply',[0.5,-1.4,0.01]);
+PlaceObject('cone.ply',[-1.2,-1.4,0.01]);
+
+PlaceObject('fireExtinguisherElevated.ply', [-1.8,0.65,0.01]);
+PlaceObject('emergencyStopButton.PLY',[-2,-1.8,0.01]);
 
 % Unsorted oranges crate
 PlaceObject('fruit_crate_unsorted.ply',[-0.7,-0.35,0.01]);
@@ -237,39 +247,39 @@ display(['=====================================']);
 %% Conduct Quality Control on set 1
 display(['Quality Control S1: Begin Filtering.']);
 
-for x = 1:size(tree1_sorted_crate_pos, 1)
-    % Look for orange
-    display(['Quality Control S1: Look for oranges to filter ', num2str(x)]);
-    robotFunctions.MoveRobot(QA,[-0.7,-0.35,1.2],50,0,true,0,1);
-    
-    % Move to initial orange location
-    display(['Quality Control S1: Go to orange ', num2str(x)]);
-    robotFunctions.MoveRobot(QA,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)],50,0,true,0,1);
-
-    % Gripper grasp orange
-
-    % Move oranges away from tree
-    display(['Quality Control S1: Pick orange ', num2str(x), ' from tree.']);
-    robotFunctions.MoveRobot(QA,[tree1_above_crate(x,1),tree1_above_crate(x,2)-0.2,tree1_above_crate(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
-
-    % Move oranges above crate
-    display(['Quality Control S1: Place orange ', num2str(x), ' above crate.']);
-    robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,tree1_obj{x},true,tree1_verts{x},2);
- 
-    % Place oranges in crate
-    display(['Quality Control S1: Place orange ', num2str(x), ' within the crate.']);
-    robotFunctions.MoveRobot(QA,[tree1_sorted_crate_pos(x,1),tree1_sorted_crate_pos(x,2),tree1_sorted_crate_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
-
-    % Release gripper
-
-
-    % Lift End Effector from crate
-    display(['Quality Control S1: Lift gripper ', num2str(x), ' from the crate.']);
-    robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,0,false,0,2);
-
-    % Count orange picked.
-    display(['Quality Control S1: The total number of oranges picked from tree 1 is ', num2str(x)]);
-end
+% for x = 1:size(tree1_sorted_crate_pos, 1)
+%     % Look for orange
+%     display(['Quality Control S1: Look for oranges to filter ', num2str(x)]);
+% %     robotFunctions.MoveRobot(QA,[-0.7,-0.35,1.2],50,0,true,0,1);
+%     
+%     % Move to initial orange location
+%     display(['Quality Control S1: Go to orange ', num2str(x)]);
+%     robotFunctions.MoveRobot(QA,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)],50,0,true,0,1);
+% 
+%     % Gripper grasp orange
+% 
+%     % Move oranges away from tree
+%     display(['Quality Control S1: Pick orange ', num2str(x), ' from tree.']);
+%     robotFunctions.MoveRobot(QA,[tree1_above_crate(x,1),tree1_above_crate(x,2)-0.2,tree1_above_crate(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
+% 
+%     % Move oranges above crate
+%     display(['Quality Control S1: Place orange ', num2str(x), ' above crate.']);
+%     robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,tree1_obj{x},true,tree1_verts{x},2);
+%  
+%     % Place oranges in crate
+%     display(['Quality Control S1: Place orange ', num2str(x), ' within the crate.']);
+%     robotFunctions.MoveRobot(QA,[tree1_sorted_crate_pos(x,1),tree1_sorted_crate_pos(x,2),tree1_sorted_crate_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
+% 
+%     % Release gripper
+% 
+% 
+%     % Lift End Effector from crate
+%     display(['Quality Control S1: Lift gripper ', num2str(x), ' from the crate.']);
+%     robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,0,false,0,2);
+% 
+%     % Count orange picked.
+%     display(['Quality Control S1: The total number of oranges picked from tree 1 is ', num2str(x)]);
+% end
 
 display(['Quality Control S1: Completed Filtering.']);
 display(['=====================================']);
