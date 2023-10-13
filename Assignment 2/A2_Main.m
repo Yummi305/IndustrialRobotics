@@ -40,13 +40,13 @@ tree_position = [-0.4, 0.6, 0;
 %% Initialise Farm
 
 % Unsorted oranges crate
-PlaceObject('fruit_crate_unsorted.ply',[-0.85,-0.4,0.01]);
+PlaceObject('fruit_crate_unsorted.ply',[-0.7,-0.35,0.01]);
 
-% Ripe oranges crate
-PlaceObject('fruit_crate_ripe.ply',[-0.45,-0.4,0.01]);
-
-% Overripe oranges crate
-PlaceObject('fruit_crate_over_ripe.ply',[-0.05,-0.4,0.01]);
+% % Ripe oranges crate
+% PlaceObject('fruit_crate_ripe.ply',[-0.45,-0.4,0.01]);
+% 
+% % Overripe oranges crate
+% PlaceObject('fruit_crate_over_ripe.ply',[-0.05,-0.4,0.01]);
 
 % Trees
 objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
@@ -72,8 +72,7 @@ tree1_picked(:, 2) = tree1_picked(:, 2) - 0.6;
 tree2_pos = [-1.1, 0.3, 0.35;
               -1.15, 0.3, 0.54;
               -0.9, 0.4, 0.5;
-              -1, 0.4, 0.55;
-              -1.25, 0.26, 0.45];
+              -1, 0.4, 0.55];
 
 % Store orange objects and vertices
 tree2_obj = cell(1, size(tree2_pos, 1));
@@ -85,17 +84,16 @@ tree2_picked(:, 2) = tree2_picked(:, 2) - 0.1;
 
 %% Crate Positions
 % Tree 1 Orange Crate Locations
-tree1_crate_pos = [-0.65,-0.3,0.04; 
+tree1_crate_pos = [-0.55,-0.3,0.04; 
+                   -0.65,-0.3,0.04; 
                    -0.75,-0.3,0.04; 
-                   -0.85,-0.3,0.04; 
-                   -0.95,-0.3,0.04];
+                   -0.85,-0.3,0.04];
 
 % Tree 2 Orange Crate Locations
-tree2_crate_pos = [-1.05,-0.4,0.04
-                   -0.95,-0.4,0.04; 
-                   -0.85,-0.4,0.04; 
-                   -0.75,-0.4,0.04; 
-                   -0.65,-0.4,0.04];
+tree2_crate_pos = [-0.85,-0.37,0.04
+                   -0.75,-0.37,0.04; 
+                   -0.65,-0.37,0.04; 
+                   -0.55,-0.37,0.04];
 
 % Tree 1 Orange above crate
 tree1_above_crate = tree1_crate_pos;
@@ -116,6 +114,9 @@ tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 0.8;
 %% Generate LinearUR3
 % Initialise LinearUR3
 harvestBot = LinearUR3(transl(0,0,0.02));
+
+%% Generate Franka Emika (Panda)
+filterBot = Panda(transl(0,-1,0.02));
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
