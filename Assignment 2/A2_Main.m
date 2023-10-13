@@ -16,7 +16,7 @@ objFunc = ObjectFunctions();
 
 
 %% Setup environment
-axis([-1.7, 0.5, -1, 1.5, 0.01, 1.5]);
+axis([-1.7, 0.5, -1.5, 1, 0.01, 1.5]);
 % axis equal;
 hold on
 
@@ -40,13 +40,13 @@ tree_position = [-0.4, 0.6, 0;
 %% Initialise Farm
 
 % Unsorted oranges crate
-PlaceObject('fruit_crate_unsorted.ply',[-1.0,-0.45,0.01]);
+PlaceObject('fruit_crate_unsorted.ply',[-0.85,-0.4,0.01]);
 
 % Ripe oranges crate
-PlaceObject('fruit_crate_ripe.ply',[-0.6,-0.45,0.01]);
+PlaceObject('fruit_crate_ripe.ply',[-0.45,-0.4,0.01]);
 
 % Overripe oranges crate
-PlaceObject('fruit_crate_over_ripe.ply',[-0.2,-0.45,0.01]);
+PlaceObject('fruit_crate_over_ripe.ply',[-0.05,-0.4,0.01]);
 
 % Trees
 objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
@@ -66,15 +66,6 @@ tree1_verts = cell(1, size(tree1_pos, 1));
 tree1_picked = tree1_pos;
 tree1_picked(:, 2) = tree1_picked(:, 2) - 0.6; 
 
-% Tree 1 Orange Crate Locations
-tree1_crate_pos = [-1.0,-0.5,0.01; 
-                   -1.0,-0.5,0.01; 
-                   -1.0,-0.5,0.01; 
-                   -1.0,-0.5,0.01];
-
-% Tree 1 Orange above crate
-tree1_above_crate = tree1_crate_pos;
-tree1_above_crate(:, 3) = tree1_above_crate(:, 3) + 1;
 
 %% Tree 2 Oranges
 % Tree 2 Orange Initial Locaitons
@@ -92,16 +83,27 @@ tree2_verts = cell(1, size(tree2_pos, 1));
 tree2_picked = tree2_pos;
 tree2_picked(:, 2) = tree2_picked(:, 2) - 0.1;
 
+%% Crate Positions
+% Tree 1 Orange Crate Locations
+tree1_crate_pos = [-0.65,-0.3,0.04; 
+                   -0.75,-0.3,0.04; 
+                   -0.85,-0.3,0.04; 
+                   -0.95,-0.3,0.04];
+
 % Tree 2 Orange Crate Locations
-tree2_crate_pos = [-1.0,-0.5,0.01; 
-                   -1.0,-0.5,0.01; 
-                   -1.0,-0.5,0.01; 
-                   -1.0,-0.5,0.01;
-                   -1.0,-0.5,0.01];
+tree2_crate_pos = [-1.05,-0.4,0.04
+                   -0.95,-0.4,0.04; 
+                   -0.85,-0.4,0.04; 
+                   -0.75,-0.4,0.04; 
+                   -0.65,-0.4,0.04];
+
+% Tree 1 Orange above crate
+tree1_above_crate = tree1_crate_pos;
+tree1_above_crate(:, 3) = tree1_above_crate(:, 3) + 0.8;
 
 % Tree 2 Orange above crate
 tree2_above_crate = tree2_crate_pos;
-tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 1;
+tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 0.8;
 
 %% Grow Fruit
 
