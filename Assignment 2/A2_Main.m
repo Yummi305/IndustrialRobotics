@@ -35,18 +35,19 @@ hold on
 %% Farm Environment
 % Tree Location Container
 tree_position = [-0.4, 0.6, 0; 
-                 -1.2, 0.6, 0];
+                 -1.2, 0.6, 0;
+                  0.4, 0.6, 0];
 
 %% Initialise Farm
 
 % Unsorted oranges crate
 PlaceObject('fruit_crate_unsorted.ply',[-0.7,-0.35,0.01]);
 
-% % Ripe oranges crate
-% PlaceObject('fruit_crate_ripe.ply',[-0.45,-0.4,0.01]);
-% 
-% % Overripe oranges crate
-% PlaceObject('fruit_crate_over_ripe.ply',[-0.05,-0.4,0.01]);
+% Ripe oranges crate
+PlaceObject('fruit_crate_ripe.ply',[-1.3,-0.6,0.01]);
+
+% Overripe oranges crate
+PlaceObject('fruit_crate_over_ripe.ply',[-1.3,-1.0,0.01]);
 
 % Trees
 objFunc.PlaceManyObjects('treeOrange.ply',tree_position, false, 0, 0);
@@ -116,7 +117,8 @@ tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 0.8;
 harvestBot = LinearUR3(transl(0,0,0.02));
 
 %% Generate Franka Emika (Panda)
-filterBot = Panda(transl(0,-1,0.02));
+QA = Panda(transl(-0.7,-0.7,0.02));
+QA.PlotAndColourPandaRobot();
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
