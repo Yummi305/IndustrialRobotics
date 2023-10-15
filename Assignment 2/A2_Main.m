@@ -153,7 +153,10 @@ QA.PlotAndColourPandaRobot();
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
-
+pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+g1 = GripRight(pos1); % initiate right gripper
+g2 = GripLeft(pos2); % initial left gripper
 
 %% Harvest Tree 1
 display(['Tree 1 Harvest: Beginning picking process.']);
