@@ -50,6 +50,7 @@ classdef RobotFunctions
                     % Apply transformation to objects vertices to visualise movement
                     if holdingObject
                         transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
+                        transMatrix = transMatrix*transl(0,0,0.2);
                         transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
                         set(payload,'Vertices',transfromedVert(:,1:3));
                     end
