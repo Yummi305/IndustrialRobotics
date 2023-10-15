@@ -71,7 +71,7 @@ classdef RobotFunctions
         
         if goal == 1
 
-            % Close Gripper
+        % Close Gripper
 
         qPath1 = jtraj(rightQopen,rightQclosed,gsteps);
         qPath2 = jtraj(leftQopen,leftQclosed,gsteps);
