@@ -2,7 +2,7 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g1,g2)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g1,g2,grip)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
             if (endEffDirection == 1)
@@ -37,12 +37,15 @@ classdef RobotFunctions
                     robot.model.animate(qMatrix(i,:));
 
                     % Gripper base transform for UR3.
+                    if grip == 1
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
                     g1.model.base = pos1; 
                     g2.model.base = pos2; 
                     g1.model.animate(g1.model.getpos());
                     g2.model.animate(g2.model.getpos());
+                    else
+                    end
 
                     % Apply transformation to objects vertices to visualise movement
                     if holdingObject
@@ -54,7 +57,42 @@ classdef RobotFunctions
                 end
             
             end
+  
+        %% GripperMovement
+        function GripperMove(g1,g2,goal)
         
+        gsteps = 20; 
+        
+        leftQopen = zeros(1,3);
+        rightQopen = zeros(1,3);
+        leftQclosed = [deg2rad(-30),deg2rad(30),0];
+        rightQclosed = [deg2rad(30),deg2rad(-30),0];
+        
+        if goal == 1
+
+            % Close Gripper
+
+        qPath1 = jtraj(rightQopen,rightQclosed,gsteps);
+        qPath2 = jtraj(leftQopen,leftQclosed,gsteps);
+
+        elseif goal == 2
+
+        qPath1 = jtraj(rightQclosed,rightQopen,gsteps);
+        qPath2 = jtraj(leftQclosed,leftQopen,gsteps);
+
+        % Open Gripper
+
+        end
+        
+        for i = 1:gsteps
+                    g1.model.animate(qPath1(i,:));
+                    g2.model.animate(qPath2(i,:));                
+                    drawnow();
+                    pause(0.02);
+        end
+        
+        end
+
         %% Form Point Cloud
         function FormPointCloud(robot)
             stepRads = deg2rad(45);
