@@ -2,7 +2,7 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g1,g2)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
             if (endEffDirection == 1)
@@ -17,10 +17,11 @@ classdef RobotFunctions
             pose = robot.model.fkine(q0);
             q1 = robot.model.ikcon(pose, q0);
             q2 = robot.model.ikcon(endMove, q0);
-        
+            
+          
             % qMatrix calculation - smooth velocity and acceleration profiles
             % Method 1 Quintic Polynomial
-%             qMatrix = jtraj(q1,q2,steps);
+            %qMatrix = jtraj(q1,q2,steps);
 
             % Method 2 Trapezoidal Velocity Profile - linear interpolation between points
             s = lspb(0,1,steps);  % First, create the scalar function
@@ -30,12 +31,18 @@ classdef RobotFunctions
             end
         
             % Execute the motion
+
+
                 for i = 1:steps
                     robot.model.animate(qMatrix(i,:));
 
-                    % Insert gripper base transform here.
-
-                     %HERE
+                    % Gripper base transform for UR3.
+                    pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
+                    pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
+                    g1.model.base = pos1; 
+                    g2.model.base = pos2; 
+                    g1.model.animate(g1.model.getpos());
+                    g2.model.animate(g2.model.getpos());
 
                     % Apply transformation to objects vertices to visualise movement
                     if holdingObject
