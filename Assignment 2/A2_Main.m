@@ -176,7 +176,7 @@ for x = 1:size(tree1_pos, 1)
 
     % Move oranges away from tree
     display(['Tree 1 Harvest: Pick orange ', num2str(x), ' from tree.']);
-    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2)-0.2,tree1_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},2);
+    robotFunctions.MoveRobot(harvestBot,[tree1_pos(x,1),tree1_pos(x,2)-0.2,tree1_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},1);
 
     % Move oranges above crate
     display(['Tree 1 Harvest: Place orange ', num2str(x), ' above crate.']);

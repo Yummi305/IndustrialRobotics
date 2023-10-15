@@ -2,7 +2,7 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingBrick, vertices, endEffDirection)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
             if (endEffDirection == 1)
@@ -32,10 +32,15 @@ classdef RobotFunctions
             % Execute the motion
                 for i = 1:steps
                     robot.model.animate(qMatrix(i,:));
-                    % Apply transformation to brick vertices to visualise movement
-                    if holdingBrick
-                        transMatrix = robot.model.fkine(qMatrix(i,:)).T;
-                        transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix';
+
+                    % Insert gripper base transform here.
+
+                     %HERE
+
+                    % Apply transformation to objects vertices to visualise movement
+                    if holdingObject
+                        transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
+                        transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
                         set(payload,'Vertices',transfromedVert(:,1:3));
                     end
                     drawnow();
