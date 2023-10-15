@@ -32,7 +32,12 @@ classdef RobotFunctions
             % Execute the motion
                 for i = 1:steps
                     robot.model.animate(qMatrix(i,:));
-                    % Apply transformation to brick vertices to visualise movement
+
+                    % Insert gripper base transform here.
+
+                     %HERE
+
+                    % Apply transformation to objects vertices to visualise movement
                     if holdingObject
                         transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
                         transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
