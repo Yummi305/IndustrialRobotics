@@ -151,16 +151,34 @@ tree2_above_sorted_crate(:, 3) = tree2_above_sorted_crate(:, 3) + 0.8;
 % Initialise LinearUR3
 harvestBot = LinearUR3(transl(0,0,0.02));
 
-%% Generate Franka Emika (Panda)
-QA = Panda(transl(-0.7,-0.7,0.02));
-QA.PlotAndColourPandaRobot();
-
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on end effector.
 pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
 pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
 g1 = GripRight(pos1); % initiate right gripper
 g2 = GripLeft(pos2); % initial left gripper
+
+%% Generate Franka Emika (Panda)
+QA = Panda(transl(-0.7,-0.7,0.02));
+QA.PlotAndColourPandaRobot();
+
+%% Franka Emika Gripper
+%  p_q0 = zeros (1, QA.model.n);
+%  % Left Gripper
+%  PandaLeft = PandaLeft(0); 
+%  PandaLeft.model.base = PandaLeft.model.base * QA.model.fkine(p_q0) * transl(0,-0.155,0.03) * trotz(-pi/2) * trotx(pi/2); % Forward kinematics for end-effector base
+%  PandaLeft.GetAndColourLeft()
+%  % Right Gripper
+%  PandaRight = PandaRight(0); % Finger 2 of Panda Gripper
+%  PandaRight.model.base = PandaRight.model.base * QA.model.fkine(p_q0) * transl(0,-0.155,-0.03) * trotz(-pi/2) * trotx(pi/2) * trotx(pi); % Forward kinematics for end-effector base
+%  PandaRight.GetAndColourRight()
+
+pos3 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,0.03) * trotz(-pi/2) * trotx(pi/2);
+pos4 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,-0.03) * trotz(-pi/2) * trotx(pi/2) * trotx(pi);
+g3 = PandaRight(pos1); % initiate right gripper
+g4 = PandaLeft(pos2); % initial left gripper
+% PandaLeft.GetAndColourLeft();
+% PandaRight.GetAndColourRight();
 
 %% Toggle for testing harvest
 if harvest_toggle 
@@ -268,32 +286,32 @@ if QA_toggle
     for x = 1:size(tree1_sorted_crate_pos, 1)
         % Look for orange
         display(['Quality Control S1: Look for oranges to filter ', num2str(x)]);
-    %     robotFunctions.MoveRobot(QA,[-0.7,-0.35,1.2],50,0,true,0,1,);
+        robotFunctions.MoveRobot(QA,[-0.7,-0.35,1.2],50,0,false,0,0,g3,g4,0);
         
         % Move to initial orange location
         display(['Quality Control S1: Go to orange ', num2str(x)]);
-        robotFunctions.MoveRobot(QA,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)],50,0,true,0,0,0,0,0);
+        robotFunctions.MoveRobot(QA,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)],50,0,false,0,0,g3,g4,0);
     
         % Gripper grasp orange
     
         % Move oranges away from tree
         display(['Quality Control S1: Pick orange ', num2str(x), ' from tree.']);
-        robotFunctions.MoveRobot(QA,[tree1_above_crate(x,1),tree1_above_crate(x,2)-0.2,tree1_above_crate(x,3)],50,tree1_obj{x},true,tree1_verts{x},2,0,0,0,0);
+        robotFunctions.MoveRobot(QA,[tree1_above_crate(x,1),tree1_above_crate(x,2)-0.2,tree1_above_crate(x,3)],50,0,false,0,2,g3,g4,0);
     
         % Move oranges above crate
         display(['Quality Control S1: Place orange ', num2str(x), ' above crate.']);
-        robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,tree1_obj{x},true,tree1_verts{x},2,0,0,0,0);
+        robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,0,false,0,2,g3,g4,0);
      
         % Place oranges in crate
         display(['Quality Control S1: Place orange ', num2str(x), ' within the crate.']);
-        robotFunctions.MoveRobot(QA,[tree1_sorted_crate_pos(x,1),tree1_sorted_crate_pos(x,2),tree1_sorted_crate_pos(x,3)],50,tree1_obj{x},true,tree1_verts{x},2,0,0,0,0);
+        robotFunctions.MoveRobot(QA,[tree1_sorted_crate_pos(x,1),tree1_sorted_crate_pos(x,2),tree1_sorted_crate_pos(x,3)],50,0,false,0,2,g3,g4,0);
     
         % Release gripper
     
     
         % Lift End Effector from crate
         display(['Quality Control S1: Lift gripper ', num2str(x), ' from the crate.']);
-        robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,0,false,0,2,0,0,0,0);
+        robotFunctions.MoveRobot(QA,[tree1_above_sorted_crate(x,1),tree1_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,0,false,0,2,g3,g4,0);
     
         % Count orange picked.
         display(['Quality Control S1: The total number of oranges picked from tree 1 is ', num2str(x)]);
@@ -310,31 +328,31 @@ if QA_toggle
     
         % Scan crate
         display(['Tree 2 Harvest: Look for orange ', num2str(x)]);
-        robotFunctions.MoveRobot(harvestBot,[-1.1, 0.1, 0.5],50,0,false,0,1,0);
+        robotFunctions.MoveRobot(harvestBot,[-1.1, 0.1, 0.5],50,0,false,0,0,g3,g4,0);
     
         % Move to initial brick location
         display(['Tree 2 Harvest: Go to orange ', num2str(j)]);
-        robotFunctions.MoveRobot(harvestBot,[tree2_pos(j,1),tree2_pos(j,2),tree2_pos(j,3)],50,0,false,0,1,0);
+        robotFunctions.MoveRobot(harvestBot,[tree2_pos(j,1),tree2_pos(j,2),tree2_pos(j,3)],50,0,false,0,0,g3,g4,0);
     
         % Gripper grasp orange
     
         % Move oranges away from tree
         display(['Tree 2 Harvest: Pick orange ', num2str(j), ' from tree.']);
-        robotFunctions.MoveRobot(harvestBot,[tree2_picked(j,1),tree2_picked(j,2),tree2_picked(j,3)],50,tree2_obj{j},true,tree2_verts{j},1,0);
+        robotFunctions.MoveRobot(harvestBot,[tree2_picked(j,1),tree2_picked(j,2),tree2_picked(j,3)],50,0,false,0,0,g3,g4,0);
     
         % Move oranges to crate
         display(['Tree 2 Harvest: Place orange ', num2str(j), ' above crate.']);
-        robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,tree2_obj{j},true,tree2_verts{j},2,0);
+        robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,0,false,0,0,g3,g4,0);
     
         % Place oranges in crate
         display(['Tree 2 Harvest: Place orange ', num2str(j), ' within the crate.']);
-        robotFunctions.MoveRobot(harvestBot,[tree2_crate_pos(j,1),tree2_crate_pos(j,2),tree2_crate_pos(j,3)],50,tree2_obj{j},true,tree2_verts{j},2,0);
+        robotFunctions.MoveRobot(harvestBot,[tree2_crate_pos(j,1),tree2_crate_pos(j,2),tree2_crate_pos(j,3)],50,0,false,0,0,g3,g4,0);
     
         % Release gripper
     
         % Lift End Effector from crate
         display(['Tree 2 Harvest: Lift the gripper ', num2str(j), ' from the crate.']);
-        robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,0,false,0,2,0);
+        robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)],50,0,false,0,0,g3,g4,0);
     
         % Count orange picked.
         o2_n = o2_n + 1;
@@ -342,7 +360,7 @@ if QA_toggle
     end
     
     % Return Robot to beginning.
-    robotFunctions.MoveRobot(harvestBot,[-0.2, 0, 0.65],75,0,false,0,3);
+    robotFunctions.MoveRobot(harvestBot,[-0.2, 0, 0.65],75,0,false,0,0,g3,g4,0);
     
     display(['Quality Control S2: Completed Filtering.']);
     display(['=====================================']);

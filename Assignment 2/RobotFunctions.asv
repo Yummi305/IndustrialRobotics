@@ -21,7 +21,7 @@ classdef RobotFunctions
           
             % qMatrix calculation - smooth velocity and acceleration profiles
             % Method 1 Quintic Polynomial
-            %qMatrix = jtraj(q1,q2,steps);
+            qMatrix = jtraj(q1,q2,steps);
 
             % Method 2 Trapezoidal Velocity Profile - linear interpolation between points
             s = lspb(0,1,steps);  % First, create the scalar function
@@ -30,40 +30,40 @@ classdef RobotFunctions
                 qMatrix(i,:) = (1-s(i))*q1 + s(i)*q2;
             end
         
-            % If gripper will open or close
-            if grip == 1 || grip == 2
+            % If gripper is required to open or close, perform calculation.
+            if grip == 1 || grip == 2 % grip == 0 means remain as is.
                 leftQopen = zeros(1,3);
                 rightQopen = zeros(1,3);
                 leftQclosed = [deg2rad(-30),deg2rad(30),0];
                 rightQclosed = [deg2rad(30),deg2rad(-30),0];
-
-                if goal == 1
+                if grip == 1
                     % Close Gripper
-                    qPath1 = jtraj(rightQopen,rightQclosed,gsteps);
-                    qPath2 = jtraj(leftQopen,leftQclosed,gsteps);
-                elseif goal == 2
+                    qPath1 = jtraj(rightQopen,rightQclosed,steps);
+                    qPath2 = jtraj(leftQopen,leftQclosed,steps);
+                elseif grip == 2
                     % Open Gripper
-                    qPath1 = jtraj(rightQclosed,rightQopen,gsteps);
-                    qPath2 = jtraj(leftQclosed,leftQopen,gsteps);
-                    end
+                    qPath1 = jtraj(rightQclosed,rightQopen,steps);
+                    qPath2 = jtraj(leftQclosed,leftQopen,steps);
+                end
             end
 
             % Execute the motion
                 for i = 1:steps
+                    % Animation of Robot
                     robot.model.animate(qMatrix(i,:));
 
-                    % Gripper base transform for UR3.
-                    pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
-                    pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
-                    g1.model.base = pos1; 
-                    g2.model.base = pos2; 
-                    g1.model.animate(g1.model.getpos());
-                    g2.model.animate(g2.model.getpos());
+                    if grip == 1 || grip == 2
+                        % Gripper base transform for UR3.
+                        pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
+                        pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
+                        g1.model.base = pos1; 
+                        g2.model.base = pos2; 
+                        g1.model.animate(g1.model.getpos());
+                        g2.model.animate(g2.model.getpos());
 
-                    if grip == 1
-
-                    else
-
+                        % Gripper open or close if necessary
+                        g1.model.animate(qPath1(i,:));
+                        g2.model.animate(qPath2(i,:));  
                     end
 
                     % Apply transformation to objects vertices to visualise movement

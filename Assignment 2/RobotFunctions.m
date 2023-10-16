@@ -21,7 +21,7 @@ classdef RobotFunctions
           
             % qMatrix calculation - smooth velocity and acceleration profiles
             % Method 1 Quintic Polynomial
-            %qMatrix = jtraj(q1,q2,steps);
+%             qMatrix = jtraj(q1,q2,steps);
 
             % Method 2 Trapezoidal Velocity Profile - linear interpolation between points
             s = lspb(0,1,steps);  % First, create the scalar function
