@@ -30,27 +30,46 @@ classdef RobotFunctions
                 qMatrix(i,:) = (1-s(i))*q1 + s(i)*q2;
             end
         
+            % If gripper is required to open or close, perform calculation.
+            if grip == 1 || grip == 2 % grip == 0 means remain as is.
+                leftQopen = zeros(1,3);
+                rightQopen = zeros(1,3);
+                leftQclosed = [deg2rad(-30),deg2rad(30),0];
+                rightQclosed = [deg2rad(30),deg2rad(-30),0];
+                if grip == 1
+                    % Close Gripper
+                    qPath1 = jtraj(rightQopen,rightQclosed,steps);
+                    qPath2 = jtraj(leftQopen,leftQclosed,steps);
+                elseif grip == 2
+                    % Open Gripper
+                    qPath1 = jtraj(rightQclosed,rightQopen,steps);
+                    qPath2 = jtraj(leftQclosed,leftQopen,steps);
+                end
+            end
+
             % Execute the motion
-
-
                 for i = 1:steps
+                    % Animation of Robot
                     robot.model.animate(qMatrix(i,:));
 
                     % Gripper base transform for UR3.
-                    if grip == 1
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
                     g1.model.base = pos1; 
                     g2.model.base = pos2; 
                     g1.model.animate(g1.model.getpos());
                     g2.model.animate(g2.model.getpos());
-                    else
+
+                    % Gripper open or close if necessary
+                    if grip == 1 || grip == 2
+                        g1.model.animate(qPath1(i,:));
+                        g2.model.animate(qPath2(i,:));  
                     end
 
                     % Apply transformation to objects vertices to visualise movement
                     if holdingObject
                         transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
-                        transMatrix = transMatrix*transl(0,0,0.2);
+                        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
                         transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
                         set(payload,'Vertices',transfromedVert(:,1:3));
                     end
