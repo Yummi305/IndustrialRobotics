@@ -34,7 +34,7 @@ classdef ObjectFunctions
         end
 
         %% Grow Oranges
-        function [objectArray, vertices] = GrowOranges(ripeOrange,OverRipeOrange, positionMatrix, objectArray, vertices)
+        function [objectArray, vertices] = GrowMandarins(ripeOrange,OverRipeOrange, positionMatrix, objectArray, vertices)
             % Place object in desired location
             for i = 1:size(positionMatrix, 1)
                 % Load the object mesh and store verts objectMesh in bricks.
