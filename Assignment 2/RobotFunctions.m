@@ -52,15 +52,15 @@ classdef RobotFunctions
                     % Animation of Robot
                     robot.model.animate(qMatrix(i,:));
 
-                    if grip == 1 || grip == 2
-                        % Gripper base transform for UR3.
-                        pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
-                        pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
-                        g1.model.base = pos1; 
-                        g2.model.base = pos2; 
-                        g1.model.animate(g1.model.getpos());
-                        g2.model.animate(g2.model.getpos());
+                    % Gripper base transform for UR3.
+                    pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
+                    pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
+                    g1.model.base = pos1; 
+                    g2.model.base = pos2; 
+                    g1.model.animate(g1.model.getpos());
+                    g2.model.animate(g2.model.getpos());
 
+                    if grip == 1 || grip == 2
                         % Gripper open or close if necessary
                         g1.model.animate(qPath1(i,:));
                         g2.model.animate(qPath2(i,:));  
