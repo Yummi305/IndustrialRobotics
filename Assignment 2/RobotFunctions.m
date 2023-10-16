@@ -2,7 +2,7 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g1,g2,grip)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
             if (endEffDirection == 1)
@@ -55,15 +55,17 @@ classdef RobotFunctions
                     % Gripper base transform for UR3.
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
-                    g1.model.base = pos1; 
-                    g2.model.base = pos2; 
-                    g1.model.animate(g1.model.getpos());
-                    g2.model.animate(g2.model.getpos());
+
+                    
+                    g_1.model.base = pos1; 
+                    g_2.model.base = pos2; 
+                    g_1.model.animate(g_1.model.getpos());
+                    g_2.model.animate(g_2.model.getpos());
 
                     if grip == 1 || grip == 2
                         % Gripper open or close if necessary
-                        g1.model.animate(qPath1(i,:));
-                        g2.model.animate(qPath2(i,:));  
+                        g_1.model.animate(qPath1(i,:));
+                        g_2.model.animate(qPath2(i,:));  
                     end
 
                     % Apply transformation to objects vertices to visualise movement

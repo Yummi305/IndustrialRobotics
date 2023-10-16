@@ -152,7 +152,7 @@ tree2_above_sorted_crate(:, 3) = tree2_above_sorted_crate(:, 3) + 0.8;
 harvestBot = LinearUR3(transl(0,0,0.02));
 
 %% Initialise Gripper on UR3 End Effector
-% Initialise Gripper robots on end effector.
+% Initialise Gripper robots on UR3 end effector.
 pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
 pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
 g1 = GripRight(pos1); % initiate right gripper
@@ -160,25 +160,13 @@ g2 = GripLeft(pos2); % initial left gripper
 
 %% Generate Franka Emika (Panda)
 QA = Panda(transl(-0.7,-0.7,0.02));
-QA.PlotAndColourPandaRobot();
 
 %% Franka Emika Gripper
-%  p_q0 = zeros (1, QA.model.n);
-%  % Left Gripper
-%  PandaLeft = PandaLeft(0); 
-%  PandaLeft.model.base = PandaLeft.model.base * QA.model.fkine(p_q0) * transl(0,-0.155,0.03) * trotz(-pi/2) * trotx(pi/2); % Forward kinematics for end-effector base
-%  PandaLeft.GetAndColourLeft()
-%  % Right Gripper
-%  PandaRight = PandaRight(0); % Finger 2 of Panda Gripper
-%  PandaRight.model.base = PandaRight.model.base * QA.model.fkine(p_q0) * transl(0,-0.155,-0.03) * trotz(-pi/2) * trotx(pi/2) * trotx(pi); % Forward kinematics for end-effector base
-%  PandaRight.GetAndColourRight()
-
-pos3 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,0.03) * trotz(-pi/2) * trotx(pi/2);
-pos4 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,-0.03) * trotz(-pi/2) * trotx(pi/2) * trotx(pi);
-g3 = PandaRight(pos1); % initiate right gripper
-g4 = PandaLeft(pos2); % initial left gripper
-% PandaLeft.GetAndColourLeft();
-% PandaRight.GetAndColourRight();
+% Initialise Gripper robots on Panda end effector.
+pos3 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,0.155,0.03) * trotx(pi/2);  % Base position right gripper offset from Panda's end effector
+pos4 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,0.03) * trotx(pi/2); % Base position left gripper offset from Panda's end effector
+g3 = PandaRight(pos3); % initiate right gripper
+g4 = PandaLeft(pos4); % initial left gripper
 
 %% Toggle for testing harvest
 if harvest_toggle 
