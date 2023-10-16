@@ -23,7 +23,7 @@ classdef Panda < RobotBaseClass
               link(4) = Link([0     0      0.0825    -pi/2   0]); 
               link(5) = Link([0   0.384   -0.0825    -pi/2   0]); 
               link(6) = Link([0     0        0        pi/2   0]); 
-              link(7) = Link([0     0      0.088      pi/2   0]); 
+%               link(7) = Link([0     0      0.088      pi/2   0]); 
          
         % Incorporate joint limits
               link(1).qlim = [-2.7437 2.7437];
@@ -32,7 +32,7 @@ classdef Panda < RobotBaseClass
               link(4).qlim = [-3.0421 -0.1518];
               link(5).qlim = [-2.8065 2.8065];
               link(6).qlim = [0.5445 4.5169];
-              link(7).qlim = [-3.0159 3.0159];
+%               link(7).qlim = [-3.0159 3.0159];
         
             self.model = SerialLink(link,'name',self.name);
         end      
