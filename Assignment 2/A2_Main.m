@@ -6,7 +6,7 @@ close all;
 
 %% Testing mode toggle
 harvest_toggle = true;
-QA_toggle = true;
+QA_toggle = false;
 
 %% Create instance of Robot Functions Class in order to access functions
 robotFunctions = RobotFunctions();
@@ -158,6 +158,8 @@ pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0
 g1 = GripRight(pos1); % initiate right gripper
 g2 = GripLeft(pos2); % initial left gripper
 
+robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
+
 %% Generate Franka Emika (Panda)
 QA = Panda(transl(-0.7,-0.7,0.02));
 
@@ -166,7 +168,9 @@ QA = Panda(transl(-0.7,-0.7,0.02));
 pos3 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,0.155,0.03) * trotx(pi/2);  % Base position right gripper offset from Panda's end effector
 pos4 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,0.03) * trotx(pi/2); % Base position left gripper offset from Panda's end effector
 g3 = PandaRight(pos3); % initiate right gripper
-g4 = PandaLeft(pos4); % initial left gripper
+g4 = PandaLeft(pos4); % initial left gripper 
+
+robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
 %% Toggle for testing harvest
 if harvest_toggle 

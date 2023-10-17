@@ -32,10 +32,14 @@ classdef RobotFunctions
         
             % If gripper is required to open or close, perform calculation.
             if grip == 1 || grip == 2 % grip == 0 means remain as is.
-                leftQopen = zeros(1,3);
-                rightQopen = zeros(1,3);
+
+                % Open and close state set at +/- 10 degrees after initial
+                % close (See GripperMove fucntion)
+                leftQopen = [deg2rad(-20),deg2rad(20),0];
+                rightQopen = [deg2rad(20),deg2rad(-20),0];
                 leftQclosed = [deg2rad(-30),deg2rad(30),0];
                 rightQclosed = [deg2rad(30),deg2rad(-30),0];
+
                 if grip == 1
                     % Close Gripper
                     qPath1 = jtraj(rightQopen,rightQclosed,steps);
@@ -81,26 +85,26 @@ classdef RobotFunctions
             end
   
         %% GripperMovement
-        function GripperMove(g1,g2,goal)
+        function GripperMove(g1,g2,goal) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
         
         gsteps = 20; 
         
-        leftQopen = zeros(1,3);
-        rightQopen = zeros(1,3);
-        leftQclosed = [deg2rad(-30),deg2rad(30),0];
-        rightQclosed = [deg2rad(30),deg2rad(-30),0];
+        Initial_leftQopen = zeros(1,3);
+        Initial_rightQopen = zeros(1,3);
+        Initial_leftQclosed = [deg2rad(-20),deg2rad(20),0];
+        Initial_rightQclosed = [deg2rad(20),deg2rad(-20),0];
         
         if goal == 1
 
         % Close Gripper
 
-        qPath1 = jtraj(rightQopen,rightQclosed,gsteps);
-        qPath2 = jtraj(leftQopen,leftQclosed,gsteps);
+        qPath1 = jtraj(Initial_rightQopen,Initial_rightQclosed,gsteps);
+        qPath2 = jtraj(Initial_leftQopen,Initial_leftQclosed,gsteps);
 
         elseif goal == 2
 
-        qPath1 = jtraj(rightQclosed,rightQopen,gsteps);
-        qPath2 = jtraj(leftQclosed,leftQopen,gsteps);
+        qPath1 = jtraj(Initial_rightQclosed,Initial_rightQopen,gsteps);
+        qPath2 = jtraj(Initial_leftQclosed,Initial_leftQopen,gsteps);
 
         % Open Gripper
 
