@@ -165,10 +165,10 @@ QA = Panda(transl(-0.7,-0.7,0.02));
 
 %% Franka Emika Gripper
 % Initialise Gripper robots on Panda end effector.
-pos3 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,0.155,0.03) * trotx(pi/2);  % Base position right gripper offset from Panda's end effector
-pos4 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,0.03) * trotx(pi/2); % Base position left gripper offset from Panda's end effector
-g3 = PandaRight(pos3); % initiate right gripper
-g4 = PandaLeft(pos4); % initial left gripper 
+pos3 = (QA.model.fkineUTS(QA.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+pos4 = (QA.model.fkineUTS(QA.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+g3 = GripRight(pos3); % initiate right gripper
+g4 = GripLeft(pos4); % initial left gripper 
 
 robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
