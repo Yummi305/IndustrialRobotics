@@ -6,7 +6,7 @@ close all;
 
 %% Testing mode toggle
 harvest_toggle = true;
-QA_toggle = false;
+QA_toggle = true;
 
 %% Create instance of Robot Functions Class in order to access functions
 robotFunctions = RobotFunctions();
@@ -166,8 +166,8 @@ QA = Panda(transl(-0.7,-0.7,0.02));
 %% Franka Emika Gripper
 % Initialise Gripper robots on Panda end effector.
 
-pos3 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,0.155,0.03) * trotx(pi/2);  % Base position right gripper offset from Panda's end effector
-pos4 = (QA.model.fkineUTS(QA.model.getpos())) * transl(0,-0.155,0.03) * trotx(pi/2); % Base position left gripper offset from Panda's end effector
+pos3 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0.095,-0.0127,-0.11)* trotx(-pi/2);  % Base position right gripper offset from Panda's end effector
+pos4 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0.095,0.0127,-0.11)* trotx(-pi/2); % Base position left gripper offset from Panda's end effector
 
 g3 = GripRight(pos3); % initiate right gripper
 g4 = GripLeft(pos4); % initial left gripper 

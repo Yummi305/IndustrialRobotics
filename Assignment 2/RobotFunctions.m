@@ -114,7 +114,7 @@ classdef RobotFunctions
                     g1.model.animate(qPath1(i,:));
                     g2.model.animate(qPath2(i,:));                
                     drawnow();
-                    pause(0.02);
+                    pause(0.001);
         end
         
         end
