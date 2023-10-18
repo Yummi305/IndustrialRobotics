@@ -58,10 +58,10 @@ PlaceObject('emergencyStopButton.PLY',[-2,-1.8,0.01]);
 PlaceObject('fruit_crate_unsorted.ply',[-0.7,-0.35,0.01]);
 
 % Ripe Mandarins crate
-PlaceObject('fruit_crate_ripe.ply',[-1.3,-0.6,0.01]);
+PlaceObject('fruit_crate_ripe.ply',[-1.1,-0.6,0.01]);
 
 % Overripe Mandarins crate
-PlaceObject('fruit_crate_over_ripe.ply',[-1.3,-1.0,0.01]);
+PlaceObject('fruit_crate_over_ripe.ply',[-1.1,-0.9,0.01]);
 
 % Trees
 objFunc.PlaceManyObjects('treeMandarin.ply',tree_position, false, 0, 0);
@@ -120,16 +120,20 @@ tree2_above_crate(:, 3) = tree2_above_crate(:, 3) + 0.8;
 
 %% Sorted Crate Positions
 % Tree 1 Mandarin Sorted Crate Locations
-tree1_sorted_crate_pos = [-1.3,-0.6,0.04; 
-                          -1.3,-0.6,0.04; 
-                          -1.3,-0.6,0.04; 
-                          -1.3,-1.2,0.04];
+tree1_sorted_crate_pos = [-1.2,-0.65,0.04; 
+                          -1.1,-0.65,0.04; 
+                          -1.0,-0.65,0.04; 
+                          -1.1,-0.82,0.04];
 
 % Tree 2 Mandarin Sorted Crate Locations
-tree2_sorted_crate_pos = [-1.3,-0.6,0.04
-                          -1.3,-0.6,0.04; 
-                          -1.3,-0.6,0.04; 
-                          -1.3,-1.0,0.04];
+tree2_sorted_crate_pos = [-1.2,-0.52,0.04
+                          -1.1,-0.52,0.04; 
+                          -1.0,-0.52,0.04; 
+                          -1.0,-0.82,0.04];
+
+% % Test sorted crate orange placements
+% objFunc.PlaceManyObjects('Mandarin_Ripe.ply',tree1_sorted_crate_pos, false, 0, 0);
+% objFunc.PlaceManyObjects('Mandarin_Ripe.ply',tree2_sorted_crate_pos, false, 0, 0);
 
 % Tree 1 Mandarin above sorted crate
 tree1_above_sorted_crate = tree1_sorted_crate_pos;
@@ -161,7 +165,7 @@ g2 = GripLeft(pos2); % initial left gripper
 robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
 %% Generate Franka Emika (Panda)
-QA = Panda(transl(-0.7,-0.7,0.02));
+QA = Panda(transl(-0.75,-0.58,0.02));
 
 %% Franka Emika Gripper
 % Initialise Gripper robots on Panda end effector.
