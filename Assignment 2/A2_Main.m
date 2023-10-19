@@ -6,7 +6,7 @@ close all;
 
 %% Testing mode toggle
 harvest_toggle = true;
-QA_toggle = true;
+QA_toggle = false;
 
 %% Create instance of Robot Functions Class in order to access functions
 robotFunctions = RobotFunctions();
@@ -15,7 +15,8 @@ robotFunctions = RobotFunctions();
 objFunc = ObjectFunctions();
 
 %% Setup environment
-axis([-2.2, 1, -2, 1.2, 0.01, 1.5]);
+axis([-2.2, 1, -2, 1.2, 0.01, 1.5]); % original
+% axis([-1.6, 0.8, -0.45, 1.05, 0.01, 1]); % for orange picking clips
 % axis equal;
 hold on
 
@@ -203,7 +204,7 @@ if harvest_toggle
     
         % Move Mandarins above crate
         display(['Tree 1 Harvest: Place Mandarin ', num2str(x), ' above crate.']);
-        robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)+0.7],30,tree1_obj{x},true,tree1_verts{x},2,g1,g2,0);
+        robotFunctions.MoveRobot(harvestBot,[tree1_crate_pos(x,1),tree1_crate_pos(x,2),tree1_crate_pos(x,3)+0.7],30,tree1_obj{x},true,tree1_verts{x},3,g1,g2,0);
      
         % Place Mandarins in crate
         display(['Tree 1 Harvest: Place Mandarin ', num2str(x), ' within the crate.']);
@@ -246,7 +247,7 @@ if harvest_toggle
     
         % Move Mandarins to crate
         display(['Tree 2 Harvest: Place Mandarin ', num2str(j), ' above crate.']);
-        robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)+0.7],30,tree2_obj{j},true,tree2_verts{j},2,g1,g2,0);
+        robotFunctions.MoveRobot(harvestBot,[tree2_above_crate(j,1),tree2_above_crate(j,2),tree2_above_crate(j,3)+0.7],30,tree2_obj{j},true,tree2_verts{j},2,g1,g2,3);
     
         % Place Mandarins in crate
         display(['Tree 2 Harvest: Place Mandarin ', num2str(j), ' within the crate.']);
