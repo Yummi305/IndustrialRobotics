@@ -9,6 +9,8 @@ classdef RobotFunctions
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
             elseif (endEffDirection == 2)
                 endMove = transl(position) * trotx(pi); % To position end effector to point towards z axis in negative direction
+            elseif (endEffDirection == 3)
+                endMove = transl(position) * trotx(pi/2); % To position end effector point in towards y axis in negative direction
             else
                 endMove = transl(position) * troty(-pi/2); % To position end effector to point towards x axis in negative direction
             end
