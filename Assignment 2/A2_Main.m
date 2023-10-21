@@ -5,8 +5,8 @@ clear;
 close all;
 
 %% Testing mode toggle
-harvest_toggle = true;
-QA_toggle = false;
+harvest_toggle = false;
+QA_toggle = true;
 
 %% Create instance of Robot Functions Class in order to access functions
 robotFunctions = RobotFunctions();
