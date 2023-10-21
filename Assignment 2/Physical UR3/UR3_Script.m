@@ -3,6 +3,7 @@ clear all;
 close all;
 clc;
 
+
 %% Planned motion
 %joints via real in radians
 % Note the default order of the joints is 3,2,1,4,5,6
@@ -19,6 +20,11 @@ clc;
 %% tutorial source: 
 % https://canvas.uts.edu.au/courses/27375/pages/instructions-for-using-a-real-ur3
 % https://www.youtube.com/watch?v=3ugBHAXPOMg
+
+%% Notes
+% You MUST run this script per section (via Run Section). This is due to
+% Matlab reading through the script quicker than the robot can handle. I.e.
+% it will move onto the next section before the action is performed.
 
 %% Connect
 
