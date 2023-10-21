@@ -16,7 +16,9 @@ clc;
 % 7. -2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439 place
 % 8. release
 
-%% Canvas tutorial source: https://canvas.uts.edu.au/courses/27375/pages/instructions-for-using-a-real-ur3
+%% tutorial source: 
+% https://canvas.uts.edu.au/courses/27375/pages/instructions-for-using-a-real-ur3
+% https://www.youtube.com/watch?v=3ugBHAXPOMg
 
 %% Connect
 
@@ -225,7 +227,9 @@ sendGoal(client,goal);
 
 %% Position 4 Grip
 
-[gripper]
+[gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
+gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+send(gripperPub, gripperMsg);
 
 
 %% Position 5 move away from orange
@@ -416,6 +420,10 @@ goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp +
 sendGoal(client,goal);
 
 %% Position 8 Release Grip
+[gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
+gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+send(gripperPub, gripperMsg);
+
 
 
 

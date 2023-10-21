@@ -1,3 +1,25 @@
+%% Clean up
+clear all;
+close all;
+clc;
+
+%% Planned motion
+%joints via real in radians
+% Note the default order of the joints is 3,2,1,4,5,6
+%    q3 q2 q1 q4 q5 q6
+% 1. 0.0 -1.5708 0.0 -1.5708 0.0 0.0 starting
+% 2. -1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412 move towards
+% 3. -0.2687807 -2.53073 -2.19911 -0.2687807 1.44862 -0.593412 move into orange
+% 4. grip
+% 5. -1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412 move away from
+% 6. -0.383972 -1.88496 1.02974 -0.279253 1.44862 -0.593412 prep to place
+% 7. -2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439 place
+% 8. release
+
+%% tutorial source: 
+% https://canvas.uts.edu.au/courses/27375/pages/instructions-for-using-a-real-ur3
+% https://www.youtube.com/watch?v=3ugBHAXPOMg
+
 %% Connect
 
 % rosshutdown;
@@ -54,7 +76,7 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [0.2398 --0.1439 -1.2950 -1.9665 0.8154 0];
+nextJointState_123456 = [0.0 -1.5708 0.0 -1.5708 0.0 0.0];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -122,7 +144,7 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [1.3708 -0.6465 -1.1693 0.7981 0.0614 0];
+nextJointState_123456 = [-1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -186,7 +208,7 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [1.6787 -0.7194 1.0072 -1.6787 -1.2950 0];
+nextJointState_123456 = [-0.2687807 -2.53073 -2.19911 -0.2687807 1.44862 -0.593412];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -205,7 +227,9 @@ sendGoal(client,goal);
 
 %% Position 4 Grip
 
-
+[gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
+gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+send(gripperPub, gripperMsg);
 
 
 %% Position 5 move away from orange
@@ -254,7 +278,7 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [1.6787 -0.7194 1.0072 -1.6787 -1.2950 0];
+nextJointState_123456 = [-1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -316,7 +340,7 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [1.6787 -0.7194 1.0072 -1.6787 -1.2950 0];
+nextJointState_123456 = [-0.383972 -1.88496 1.02974 -0.279253 1.44862 -0.593412];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -379,7 +403,7 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [1.6787 -0.7194 1.0072 -1.6787 -1.2950 0];
+nextJointState_123456 = [-2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439];
 
 endJointSend.Positions = nextJointState_123456;
 
