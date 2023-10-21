@@ -234,7 +234,7 @@ sendGoal(client,goal);
 %% Position 4 Grip
 
 [gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
-gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+gripperMsg.Data = 0.3; % 0.5 is open, -0.5 is closed
 send(gripperPub, gripperMsg);
 
 
