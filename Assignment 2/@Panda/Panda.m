@@ -61,8 +61,9 @@ classdef Panda < RobotBaseClass
             link(4) = Link('d',0,'a',0.0825,'alpha',0,'offset',0,'qlim', [0, 0]); %GOOD % dummy offset link
             link(5) = Link('d',0,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]); %GOOD 4
             link(6) = Link('d',0,'a',0.0825,'alpha',-pi/2,'offset',0,'qlim', [0, 0]); %GOOD %dummy offset link
-            link(7) = Link('d',0.125,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);% 5
-            % link(6) = Link('d',0,'a',0,'alpha',-pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
+            link(7) = Link('d',0.125,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]); %GOOD % 5
+            link(8) = Link('d',0.2613,'a',0,'alpha',pi/2,'offset',0,'qlim', [0, 0]);% off pi/2
+            link(9) = Link('d',0,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);% off pi/2
             % link(7) = Link('d',0,'a',0.088,'alpha',-pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
             % link(8) = Link('d',0.1,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
         
