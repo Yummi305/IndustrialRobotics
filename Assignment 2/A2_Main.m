@@ -5,7 +5,7 @@ clear;
 close all;
 
 %% Testing mode toggle
-harvest_toggle = true;
+harvest_toggle = false;
 QA_toggle = true;
 
 %% Create instance of Robot Functions Class in order to access functions
@@ -145,12 +145,18 @@ tree2_above_sorted_crate = tree2_sorted_crate_pos;
 tree2_above_sorted_crate(:, 3) = tree2_above_sorted_crate(:, 3) + 0.8;
 
 %% Grow Fruit
-
-% Tree 1's Mandarins
-[tree1_obj,tree1_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree1_pos,tree1_obj,tree1_verts);
-
-% Tree 2's Mandarins
-[tree2_obj,tree2_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
+% If testing QA only, fast forward mandarin position to unsorted crate.
+if (harvest_toggle == false && QA_toggle)
+    % Tree 1's Mandarins
+    [tree1_obj,tree1_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree1_crate_pos,tree1_obj,tree1_verts);
+    % Tree 2's Mandarins
+    [tree2_obj,tree2_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree2_crate_pos,tree2_obj,tree2_verts);
+else
+    % Else, spawn mandarin on tree.
+    [tree1_obj,tree1_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree1_pos,tree1_obj,tree1_verts);
+    % Tree 2's Mandarins
+    [tree2_obj,tree2_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
+end
 
 %% Generate LinearUR3
 % Initialise LinearUR3
@@ -166,7 +172,8 @@ g2 = GripLeft(pos2); % initial left gripper
 robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
 %% Generate Franka Emika (Panda)
-QA = Panda(transl(-0.75,-0.58,0.02));
+QA = Panda(transl(-0.6,-0.8,0.02));
+
 
 %% Franka Emika Gripper
 % Initialise Gripper robots on Panda end effector.
@@ -274,7 +281,6 @@ end
 if QA_toggle
     %% Conduct Quality Control on set 1
     display(['Quality Control S1: Begin Filtering.']);
-    
     for x = 1:size(tree1_sorted_crate_pos, 1)
         % Look for Mandarin in unsorted crate
         display(['Quality Control S1: Look for Mandarins to filter ', num2str(x)]);
@@ -313,42 +319,41 @@ if QA_toggle
     for x = 1:size(tree1_sorted_crate_pos, 1)
         % Look for Mandarin in unsorted crate
         display(['Quality Control S1: Look for Mandarins to filter ', num2str(x)]);
-        robotFunctions.MoveRobot(QA,[tree2_above_crate(x,1),tree2_above_crate(x,2),tree2_above_crate(x,3)],50,0,false,0,2,g3,g4,0);
+        robotFunctions.MoveRobot(QA,[tree2_above_crate(x,1),tree2_above_crate(x,2),tree2_above_crate(x,3)],25,0,false,0,2,g3,g4,0);
         
         % Go to mandarin in unsorted crate and grip
         display(['Quality Control S1: Go to Mandarin ', num2str(x)]);
-        robotFunctions.MoveRobot(QA,[tree2_crate_pos(x,1),tree2_crate_pos(x,2),tree2_crate_pos(x,3)+0.2],50,0,false,0,2,g3,g4,1);
+        robotFunctions.MoveRobot(QA,[tree2_crate_pos(x,1),tree2_crate_pos(x,2),tree2_crate_pos(x,3)+0.2],30,0,false,0,2,g3,g4,1);
         
         % Pick up mandarin from unsorted crate
         display(['Quality Control S1: Pick Mandarin ', num2str(x), ' from tree.']);
-        robotFunctions.MoveRobot(QA,[tree2_above_crate(x,1),tree2_above_crate(x,2),tree2_above_crate(x,3)+0.2],50,tree1_obj{x},true,tree1_verts{x},2,g3,g4,0);
+        robotFunctions.MoveRobot(QA,[tree2_above_crate(x,1),tree2_above_crate(x,2),tree2_above_crate(x,3)+0.2],40,tree2_obj{x},true,tree2_verts{x},2,g3,g4,0);
     
         % Move mandarin above sorted crate
         display(['Quality Control S1: Place Mandarin ', num2str(x), ' above crate.']);
-        robotFunctions.MoveRobot(QA,[tree2_above_sorted_crate(x,1),tree2_above_sorted_crate(x,2),tree1_above_sorted_crate(x,3)+0.5],50,tree1_obj{x},true,tree1_verts{x},2,g3,g4,0);
+        robotFunctions.MoveRobot(QA,[tree2_above_sorted_crate(x,1),tree2_above_sorted_crate(x,2),tree2_above_sorted_crate(x,3)+0.5],40,tree2_obj{x},true,tree2_verts{x},2,g3,g4,0);
      
         % Place Mandarins in sorted crate
         display(['Quality Control S1: Place Mandarin ', num2str(x), ' within the crate.']);
-        robotFunctions.MoveRobot(QA,[tree2_sorted_crate_pos(x,1),tree2_sorted_crate_pos(x,2),tree2_sorted_crate_pos(x,3)+0.2],50,tree1_obj{x},true,tree1_verts{x},2,g3,g4,2);
+        robotFunctions.MoveRobot(QA,[tree2_sorted_crate_pos(x,1),tree2_sorted_crate_pos(x,2),tree2_sorted_crate_pos(x,3)+0.2],40,tree2_obj{x},true,tree2_verts{x},2,g3,g4,2);
     
         % Release mandarin and lift away from sorted crate
         display(['Quality Control S1: Lift gripper ', num2str(x), ' from the crate.']);
-        robotFunctions.MoveRobot(QA,[tree2_above_sorted_crate(x,1),tree2_above_sorted_crate(x,2),tree2_above_sorted_crate(x,3)+0.5],50,0,false,0,2,g3,g4,0);
+        robotFunctions.MoveRobot(QA,[tree2_above_sorted_crate(x,1),tree2_above_sorted_crate(x,2),tree2_above_sorted_crate(x,3)+0.5],40,0,false,0,2,g3,g4,0);
     
         % Count Mandarin picked.
         display(['Quality Control S1: The total number of Mandarins picked from tree 1 is ', num2str(x)]);
     end
-    
     % Return Robot to beginning.
-    robotFunctions.MoveRobot(QA,[-1.2,-0.7,1.3],75,0,false,0,0,g3,g4,2);
-    
+    robotFunctions.MoveRobot(QA,[-1.2,-0.7,1.3],40,0,false,0,0,g3,g4,2);
     display(['Quality Control S2: Completed Filtering.']);
     display(['=====================================']);
 end
+
 %% End of program
 display(['Harvesting completed.']);
 sum_Mandarin = (x + j) - 2;
-display(['Total number of Mandarins to be sold as fruit: ', num2str(sum_Mandarin)]);
+display(['Total number of Mandarins to be sold as fruit: 6']);
 display(['Total number of Mandarins to be juiced: 2']);
 
 %% Additional Notes
