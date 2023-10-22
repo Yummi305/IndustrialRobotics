@@ -59,8 +59,8 @@ classdef RobotFunctions
                     robot.model.animate(qMatrix(i,:));
 
                     % Gripper base transform for UR3.
-                    pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);
-                    pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);
+                    pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+                    pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
 
                     
                     g_1.model.base = pos1; 

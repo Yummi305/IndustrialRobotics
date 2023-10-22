@@ -5,7 +5,7 @@ clear;
 close all;
 
 %% Testing mode toggle
-harvest_toggle = false;
+harvest_toggle = true;
 QA_toggle = true;
 
 %% Create instance of Robot Functions Class in order to access functions
@@ -172,8 +172,8 @@ QA = Panda(transl(-0.75,-0.58,0.02));
 % Initialise Gripper robots on Panda end effector.
 
 %Using Robotiq 2f-145
-pos3 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0.095,-0.0127,-0.11)* trotx(-pi/2);  % Base position right gripper offset from Panda's end effector
-pos4 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0.095,0.0127,-0.11)* trotx(-pi/2); % Base position left gripper offset from Panda's end effector
+pos3 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,-0.0127,0.05)*trotx(-pi/2)*trotz(pi);  % Base position right gripper offset from Panda's end effector 
+pos4 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,0.0127,0.05)*trotx(-pi/2)*trotz(pi); % Base position left gripper offset from Panda's end effector 
 g3 = GripRight(pos3); % initiate right gripper
 g4 = GripLeft(pos4); % initial left gripper 
 
