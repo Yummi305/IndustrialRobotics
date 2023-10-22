@@ -45,16 +45,36 @@ classdef Panda < RobotBaseClass
 %             link(8) = Link('d',1.07,'a',0,'alpha',0,'offset',0,'qlim', [0,0]);
 
 %Franka Emika Panda bot DH paramerters (check z on j3-4)
-
-            link(1) = Link('d',0.333,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
-            link(2) = Link('d',0,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);
+            % link(1) = Link('d',0.333,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
+            % link(2) = Link('d',0,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);
             % link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
             % link(4) = Link('d',0,'a',0.0825,'alpha',pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
             % link(5) = Link('d',0.384,'a',-0.0825,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);% pos or neg dz?
             % link(6) = Link('d',0,'a',0,'alpha',-pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
             % link(7) = Link('d',0,'a',0.088,'alpha',-pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
             % link(8) = Link('d',0.1,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
+
+
+% Dennis ver
+            link(1) = Link('d',0.333,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD
+            link(2) = Link('d',0,'a',0,'alpha',pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD
+            link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD
+            link(4) = Link('d',0,'a',0.0825,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);% off pi/2
+
+            % link(5) = Link('d',0.384,'a',-0.0825,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);% pos or neg dz?
+            % link(6) = Link('d',0,'a',0,'alpha',-pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
+            % link(7) = Link('d',0,'a',0.088,'alpha',-pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
+            % link(8) = Link('d',0.1,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
         
+
+%               link(1) = Link([pi   0.333     0       -pi/2   0]);  
+%               link(2) = Link([0     0        0        pi/2   0]);  
+%               link(3) = Link([0   0.316      0        pi/2   0]);  
+%               link(4) = Link([0     0      0.0825    -pi/2   0]); 
+%               link(5) = Link([0   0.384   -0.0825    -pi/2   0]); 
+%               link(6) = Link([0     0        0        pi/2   0]); 
+%               link(7) = Link([0     0      0.088      pi/2   0]); 
+
             self.model = SerialLink(link,'name',self.name);
         end      
     end
