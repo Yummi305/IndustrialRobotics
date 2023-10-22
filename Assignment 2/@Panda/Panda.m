@@ -17,63 +17,20 @@ classdef Panda < RobotBaseClass
         function CreateModel(self)
 
 %         % Create Panda model
-%               link(1) = Link([pi   0.333     0       -pi/2   0]);  
-%               link(2) = Link([0     0        0        pi/2   0]);  
-%               link(3) = Link([0   0.316      0        pi/2   0]);  
-%               link(4) = Link([0     0      0.0825    -pi/2   0]); 
-%               link(5) = Link([0   0.384   -0.0825    -pi/2   0]); 
-%               link(6) = Link([0     0        0        pi/2   0]); 
-%               link(7) = Link([0     0      0.088      pi/2   0]); 
-% 
-%         % Incorporate joint limits
-%               link(1).qlim = [-2.7437 2.7437];
-%               link(2).qlim = [-1.7837 1.7837];
-%               link(3).qlim = [-2.9007 2.9007];
-%               link(4).qlim = [-3.0421 -0.1518];
-%               link(5).qlim = [-2.8065 2.8065];
-%               link(6).qlim = [0.5445 4.5169];
-%               link(7).qlim = [-3.0159 3.0159];
-
-%         %Franka Emika Panda bot DH paramerters
-%             link(1) = Link('d',0.333,'a',0,'alpha',0,'offset',0,'qlim', [-2.7437 2.7437]);
-%             link(2) = Link('d',0,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-1.7837,1.7837]);
-%             link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',0,'qlim', [-2.9007,2.9007]);
-%             link(4) = Link('d',0,'a',0.0825,'alpha',pi/2,'offset',0,'qlim', [-3.0421,-0.1518]);
-%             link(5) = Link('d',0.384,'a',-0.0825,'alpha',-pi/2,'offset',0,'qlim', [-2.8065,2.8065]);
-%             link(6) = Link('d',0,'a',0,'alpha',pi/2,'offset',0,'qlim', [0.5445,4.5169]);
-%             link(7) = Link('d',0,'a',0.088,'alpha',pi/2,'offset',0,'qlim', [-3.0159,3.0159]);
-%             link(8) = Link('d',1.07,'a',0,'alpha',0,'offset',0,'qlim', [0,0]);
-
-%Franka Emika Panda bot DH paramerters (check z on j3-4)
-            % link(1) = Link('d',0.333,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
-            % link(2) = Link('d',0,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);
-            % link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
-            % link(4) = Link('d',0,'a',0.0825,'alpha',pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
-            % link(5) = Link('d',0.384,'a',-0.0825,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);% pos or neg dz?
-            % link(6) = Link('d',0,'a',0,'alpha',-pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
-            % link(7) = Link('d',0,'a',0.088,'alpha',-pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
-            % link(8) = Link('d',0.1,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
 
 
-% Dennis ver
-            link(1) = Link('d',0.333,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD
-            link(2) = Link('d',0,'a',0,'alpha',pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD
-            link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD
-            link(4) = Link('d',0,'a',0.0825,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);% off pi/2
+            link(1) = Link('d',0.333,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD 1
+            link(2) = Link('d',0,'a',0,'alpha',pi/2,'offset',0,'qlim', [-2.26893, 2.07694]); %GOOD 2
+            link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD 3
+            link(4) = Link('d',0,'a',0.0825,'alpha',0,'offset',0,'qlim', [0, 0]); %GOOD % dummy offset link
+            link(5) = Link('d',0,'a',0,'alpha',0,'offset',0,'qlim', [-2.1293, 2.0944]); %GOOD 4
+            link(6) = Link('d',0,'a',0.0825,'alpha',-pi/2,'offset',0,'qlim', [0, 0]); %GOOD %dummy offset link
+            link(7) = Link('d',0.125,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]); %GOOD % 5
+            link(8) = Link('d',0.2613,'a',0,'alpha',pi/2,'offset',0,'qlim', [0, 0]);%GOOD %dummy offset link
+            link(9) = Link('d',0,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);%GOOD 6
+            link(10) = Link('d',0,'a',-0.09,'alpha',-pi/2,'offset',-pi/2,'qlim', [0, 0]);% %dummy offset link
+            link(11) = Link('d',0.105,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);%GOOD 7        
 
-            % link(5) = Link('d',0.384,'a',-0.0825,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]);% pos or neg dz?
-            % link(6) = Link('d',0,'a',0,'alpha',-pi/2,'offset',pi/2,'qlim', [-pi, pi]);% off pi/2
-            % link(7) = Link('d',0,'a',0.088,'alpha',-pi/2,'offset',-pi/2,'qlim', [-pi, pi]);% off -pi/2
-            % link(8) = Link('d',0.1,'a',0,'alpha',0,'offset',0,'qlim', [-pi, pi]);
-        
-
-%               link(1) = Link([pi   0.333     0       -pi/2   0]);  
-%               link(2) = Link([0     0        0        pi/2   0]);  
-%               link(3) = Link([0   0.316      0        pi/2   0]);  
-%               link(4) = Link([0     0      0.0825    -pi/2   0]); 
-%               link(5) = Link([0   0.384   -0.0825    -pi/2   0]); 
-%               link(6) = Link([0     0        0        pi/2   0]); 
-%               link(7) = Link([0     0      0.088      pi/2   0]); 
 
             self.model = SerialLink(link,'name',self.name);
         end      
