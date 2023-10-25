@@ -140,12 +140,14 @@ classdef CollisionFunctions
             point = robot.model.fkine(Q);
             for i = 1:length(self.centreJoints)
                 % outp <= 1 is a collision
-                result = (point.t - self.centreJoints(i)).*[self.jointX, self.jointY, 0].*(point.t - self.centreJoints(i))'
+                result = (point.t - self.centreJoints(i)) * [self.jointX, self.jointY, self.linkLeng(i)].*eye(3) * (point.t - self.centreJoints(i))'
                 if result <= 1
-                    outp = result
+                    outp = true; % Return true if collision detected
                     return
                 end
+                
             end
+            outp = false;
         end
 
         function outp = collisionCheckGrip(self, robot, P) % check collision between end effector and point P
@@ -176,8 +178,13 @@ classdef CollisionFunctions
                 P = P';
             end
 
-            place = (P - endTr.t')
-            outp = place * ([gripXY^-2, gripXY^-2, gripZ^-2].*eye(3)) * place';
+            place = (P - endTr.t');
+            result = place * ([gripXY^-2, gripXY^-2, gripZ^-2].*eye(3)) * place';
+            if result <= 1
+                outp = true; % return true if collision detected
+                return
+            end
+            outp = false;
         end
 
     end
