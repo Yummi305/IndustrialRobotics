@@ -12,7 +12,7 @@ hold on;
 
 robotFunctions = RobotFunctions();
 
-QA = Panda(transl(0,0,0));
+QA = LinearUR3(transl(0,0,0));
 
 QA.model.teach();
 
