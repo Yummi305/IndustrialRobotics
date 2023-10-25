@@ -161,6 +161,7 @@ end
 %% Generate LinearUR3
 % Initialise LinearUR3
 harvestBot = LinearUR3(transl(0,0,0.02));
+harvestBot.model.getpos()
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on UR3 end effector.
