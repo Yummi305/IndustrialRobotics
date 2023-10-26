@@ -78,8 +78,8 @@ classdef FruitLoopSystem
             
             %% Tree 2 Mandarins
             % Tree 2 Mandarin Initial Locaitons
-            tree2_pos = [-0.95, 0.43, 0.47;
-                         -0.9, 0.4, 0.5;
+            tree2_pos = [-0.95, 0.38, 0.42;
+                         -0.9, 0.38, 0.48;
                          -1, 0.38, 0.51;
                          -1.1, 0.3, 0.39];
             
