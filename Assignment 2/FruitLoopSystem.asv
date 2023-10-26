@@ -1,12 +1,11 @@
 classdef FruitLoopSystem
     properties
-        
     end
 
     methods (Static)
         function Environment
 
-            objFunc = ObjectFunctions();
+            % objFunc = ObjectFunctions();
 
             % Read environment textures
              floor = imread ('animal_crossing__grass.jpg'); % Floor Image
@@ -57,9 +56,7 @@ classdef FruitLoopSystem
             
         end
 
-        function [tree1_pos, tree1_obj, tree1_verts, tree1_picked, tree2_pos, tree2_obj, tree2_verts, tree2_picked, tree1_crate_pos, tree2_crate_pos, tree1_above_crate, tree2_above_crate, tree1_sorted_crate_pos, tree2_sorted_crate_pos] = Mandarins()
-            objFunc = ObjectFunctions();
-
+        function Mandarins
             %% Tree 1 Mandarins
             % Tree 1 Mandarin Initial Locations
             tree1_pos = [-0.4, 0.3, 0.5; 
