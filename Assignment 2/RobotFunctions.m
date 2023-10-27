@@ -142,7 +142,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
              
             qMatrix2 = nan(steps,length(robot2.model.links));  % Create memory allocation for variables
             for i = 1:steps
-                qMatrix2(i,:) = (1-s(i))*q1 + s(i)*q2;
+                qMatrix2(i,:) = (1-s(i))*q1_2 + s(i)*q2_2;
             end
         
             % If gripper is required to open or close, perform calculation.
@@ -166,20 +166,17 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 end
 
                 if grip2 == 1 
-                    % Close Gripper
+                    % Close Gripper2
                     qPath3 = jtraj(rightQopen,rightQclosed,steps);
                     qPath4 = jtraj(leftQopen,leftQclosed,steps);
 
                 elseif grip2 == 2
-                    % Open Gripper
+                    % Open Gripper2
                     qPath3 = jtraj(rightQclosed,rightQopen,steps);
                     qPath4 = jtraj(leftQclosed,leftQopen,steps);
                 end
 
-
             end
-
-                
 
             % Execute the motion
                 for i = 1:steps
@@ -206,7 +203,6 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     g_3.model.animate(g_3.model.getpos());
                     g_4.model.animate(g_4.model.getpos());
 
-                    %% Update to here
 
                     %% gripper
 
@@ -214,6 +210,13 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         % Gripper open or close if necessary
                         g_1.model.animate(qPath1(i,:));
                         g_2.model.animate(qPath2(i,:));  
+    
+                    end
+
+                    if grip2 == 1 || grip2 == 2 
+                        % Gripper open or close if necessary  
+                        g_3.model.animate(qPath3(i,:));
+                        g_4.model.animate(qPath4(i,:)); 
                     end
 
                     % Apply transformation to objects vertices to visualise movement
@@ -223,6 +226,14 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
                         set(payload,'Vertices',transfromedVert(:,1:3));
                     end
+
+                    if holdingObject2
+                        transMatrix = robot2.model.fkine(qMatrix2(i,:)).T; % create transformation matrix of current end effector position
+                        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                        transfromedVert = [vertices2,ones(size(vertices2,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                        set(payload2,'Vertices',transfromedVert(:,1:3));
+                    end
+
                     drawnow();
                 end
             
