@@ -47,7 +47,7 @@ clc;
 
 %% Connect
 
-% rosshutdown;
+rosshutdown;
 
 rosinit('192.168.27.1'); % If unsure, please ask a tutor
 
@@ -101,7 +101,11 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [0.0 -1.5708 0.0 -1.5708 0.0 0.0];
+nextJointState_123456 = deg2rad([-91.73 -90.1 -0.36 -174.91 91.24 132.73]); % initial
+% nextJointState_123456 = deg2rad([0.0 -1.5708 0.0 -1.5708 0.0 0.0]);
+% nextJointState_123456 = deg2rad([-92 -89.39 -3.11 -100.12 266.71 178.01]);
+
+
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -155,7 +159,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 2.5; % This is how many seconds the movement will take
+durationSeconds = 3; % This is how many seconds the movement will take
 
  
 
@@ -171,7 +175,10 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
 %                    123:-0.2687807 -2.53073 -2.19911 goes into ground   |   321:-2.19911 -2.53073 -0.2687807
 % nextJointState_123456 = [-2.5973 -0.3525 -1.0399 -0.3405 1.5145 0.0005];
-nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 -0.5848];
+% nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 -0.5848];
+nextJointState_123456 = deg2rad([-92 -89.39 -3.11 -100.12 266.71 178.01]);
+
+
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -221,7 +228,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 2; % This is how many seconds the movement will take
+durationSeconds = 3; % This is how many seconds the movement will take
 
  
 
@@ -240,7 +247,8 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 %    downward placement       [-1.5782 -2.0525 -1.5024 -1.1746 1.5836 -0.7342]
 %    original placement       [-2.19911 -1.67552 -1.5708 0.0523599 1.44862 -0.593412]
 % nextJointState_123456 = [-1.5782 -2.0525 -1.5024 -1.1746 1.5836 -0.7342];
-nextJointState_123456 = [-1.8260 -1.3205 1.0219 -0.8673 1.4747 -0.5839];
+% nextJointState_123456 = [-1.8260 -1.3205 1.0219 -0.8673 1.4747 -0.5839];
+nextJointState_123456 = deg2rad([-92.18 -68.9 -2.59 -122.19 266.71 178.0]);
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -260,7 +268,7 @@ sendGoal(client,goal);
 %% Position 4 Grip
 
 [gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
-gripperMsg.Data = 0.3; % 0.5 is open, -0.5 is closed
+gripperMsg.Data = 0.2; % 0.5 is open, -0.5 is closed
 send(gripperPub, gripperMsg);
 
 
@@ -313,7 +321,9 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 % nextJointState_123456 = [-1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412];
 
 % move away back to grab prep pose
-nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 1.1848];
+% nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 1.1848];
+nextJointState_123456 = deg2rad([-92 -89.39 -3.11 -100.12 266.71 178.01]);
+
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -378,7 +388,11 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 % nextJointState_123456 = [-1.4593 -1.88496 1.02974 -0.279253 1.44862 -0.593412]; % pick up pose
 
 % prep for placement pose
-nextJointState_123456 = [-1.5782 -1.9713 -1.2010 -1.5572 1.5840 1.1849];
+% nextJointState_123456 = [-1.5782 -1.9713 -1.2010 -1.5572 1.5840 1.1849];
+
+% gripper
+nextJointState_123456 = deg2rad([-91.85 -111.61 -36.1 -119.71 93.27 178]);
+
 
 
 endJointSend.Positions = nextJointState_123456;
@@ -445,7 +459,12 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 % nextJointState_123456 = [-2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439];
 
 % placement pose
-nextJointState_123456 = [-1.5781 -2.2595 -1.6502 -0.8197 1.5829 1.1845]; 
+% nextJointState_123456 = [-1.5781 -2.2595 -1.6502 -0.8197 1.5829 1.1845];
+
+%gripper bot placement
+% nextJointState_123456 = deg2rad([-92.44 -117.96 -56.05 -98.4 91.97 178.01]);
+nextJointState_123456 = deg2rad([-88.57 -113.02 -63.48 -94.54 90.86 178]);
+
 
 
 endJointSend.Positions = nextJointState_123456;
@@ -464,7 +483,7 @@ sendGoal(client,goal);
 
 %% Position 8 Release Grip
 [gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
-gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+gripperMsg.Data = 0.1; % 0.5 is open, -0.5 is closed
 send(gripperPub, gripperMsg);
 
 
