@@ -63,16 +63,13 @@ pause(2); % Pause to give time for a message to appear
 
 currentJointState_321456 = (jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
 
-currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
+currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)]; % Update joint state to match real robot default.
 
- 
 
 % jointStateSubscriber.LatestMessage
 
- 
 
 jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
-
  
 
 [client, goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
@@ -86,22 +83,18 @@ goal.Trajectory.Header.Stamp = rostime('Now','system');
 goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
-
 durationSeconds = 5; % This is how many seconds the movement will take
 
- 
 
 startJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
 startJointSend.Positions = currentJointState_123456;
 
-startJointSend.TimeFromStart = rosduration(0);     
-
-      
+startJointSend.TimeFromStart = rosduration(0);       
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = deg2rad([-91.73 -90.1 -0.36 -174.91 91.24 132.73]); % initial
+nextJointState_123456 = deg2rad([-91.73 -90.1 -0.36 -174.91 91.24 132.73]); % initial grip facing down
 % nextJointState_123456 = deg2rad([0.0 -1.5708 0.0 -1.5708 0.0 0.0]);
 % nextJointState_123456 = deg2rad([-92 -89.39 -3.11 -100.12 266.71 178.01]);
 
@@ -117,15 +110,9 @@ goal.Trajectory.Points = [startJointSend; endJointSend];
 
 goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp + rosduration(bufferSeconds);
 
- 
 
 sendGoal(client,goal);
 
- 
-
- 
-
- 
 
 %% Position 2  move toward orange
 
@@ -136,16 +123,13 @@ pause(2); % Pause to give time for a message to appear
 currentJointState_321456 = (jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
 
 currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
-
  
 
 jointStateSubscriber.LatestMessage
-
  
 
 jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
 
- 
 
 [client, goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
 
@@ -173,11 +157,10 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-%                    123:-0.2687807 -2.53073 -2.19911 goes into ground   |   321:-2.19911 -2.53073 -0.2687807
+%  123:-0.2687807 -2.53073 -2.19911 goes into ground   |   321:-2.19911 -2.53073 -0.2687807
 % nextJointState_123456 = [-2.5973 -0.3525 -1.0399 -0.3405 1.5145 0.0005];
 % nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 -0.5848];
 nextJointState_123456 = deg2rad([-92 -89.39 -3.11 -100.12 266.71 178.01]);
-
 
 
 endJointSend.Positions = nextJointState_123456;
@@ -272,7 +255,7 @@ gripperMsg.Data = 0.2; % 0.5 is open, -0.5 is closed
 send(gripperPub, gripperMsg);
 
 
-%% Position 5 move away from orange
+%% Position 5 move away from orange (Pick)
 
 jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
 
@@ -282,15 +265,12 @@ currentJointState_321456 = (jointStateSubscriber.LatestMessage.Position)'; % Not
 
 currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
 
- 
 
 jointStateSubscriber.LatestMessage
 
- 
 
 jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
 
- 
 
 [client, goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
 
@@ -339,7 +319,7 @@ goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp +
 
 sendGoal(client,goal);
 
-%% Position 6 move to place
+%% Position 6 move above placing zone
 
 jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
 
@@ -373,16 +353,12 @@ bufferSeconds = 1; % This allows for the time taken to send the message. If the 
 
 durationSeconds = 2.5; % This is how many seconds the movement will take
 
- 
-
 startJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
 startJointSend.Positions = currentJointState_123456;
 
 startJointSend.TimeFromStart = rosduration(0);     
-
-      
-
+     
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
 % nextJointState_123456 = [-1.4593 -1.88496 1.02974 -0.279253 1.44862 -0.593412]; % pick up pose
@@ -394,18 +370,15 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 nextJointState_123456 = deg2rad([-91.85 -111.61 -36.1 -119.71 93.27 178]);
 
 
-
 endJointSend.Positions = nextJointState_123456;
 
 endJointSend.TimeFromStart = rosduration(durationSeconds);
 
- 
 
 goal.Trajectory.Points = [startJointSend; endJointSend];
 
 goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp + rosduration(bufferSeconds);
 
- 
 
 sendGoal(client,goal);
 
@@ -419,16 +392,11 @@ pause(2); % Pause to give time for a message to appear
 currentJointState_321456 = (jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
 
 currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
-
  
-
 jointStateSubscriber.LatestMessage
 
  
-
 jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
-
- 
 
 [client, goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
 
@@ -445,13 +413,11 @@ bufferSeconds = 1; % This allows for the time taken to send the message. If the 
 durationSeconds = 3; % This is how many seconds the movement will take
 
  
-
 startJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
 startJointSend.Positions = currentJointState_123456;
 
 startJointSend.TimeFromStart = rosduration(0);     
-
       
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
@@ -466,12 +432,10 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 nextJointState_123456 = deg2rad([-88.57 -113.02 -63.48 -94.54 90.86 178]);
 
 
-
 endJointSend.Positions = nextJointState_123456;
 
 endJointSend.TimeFromStart = rosduration(durationSeconds);
 
- 
 
 goal.Trajectory.Points = [startJointSend; endJointSend];
 
@@ -486,6 +450,8 @@ sendGoal(client,goal);
 gripperMsg.Data = 0.1; % 0.5 is open, -0.5 is closed
 send(gripperPub, gripperMsg);
 
+
+%% Return to picking Position 2 (Looking for oranges
 
 
 
