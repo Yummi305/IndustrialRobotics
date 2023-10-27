@@ -111,13 +111,13 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             %% Robot2 end effector direction
             if (endEffDirection2 == 1)
-                endMove2 = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
+                endMove2 = transl(position2) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
             elseif (endEffDirection2 == 2)
-                endMove2 = transl(position) * trotx(pi); % To position end effector to point towards z axis in negative direction
+                endMove2 = transl(position2) * trotx(pi); % To position end effector to point towards z axis in negative direction
             elseif (endEffDirection2 == 3)
-                endMove2 = transl(position) * trotx(pi/2); % To position end effector point in towards y axis in negative direction
+                endMove2 = transl(position2) * trotx(pi/2); % To position end effector point in towards y axis in negative direction
             else
-                endMove2 = transl(position) * troty(-pi/2); % To position end effector to point towards x axis in negative direction
+                endMove2 = transl(position2) * troty(-pi/2); % To position end effector to point towards x axis in negative direction
             end
 
             q0_2 = robot2.model.getpos();
