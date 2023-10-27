@@ -3,6 +3,7 @@ clear all;
 close all;
 clc;
 
+
 %% Planned motion
 %joints via real in radians
 % Note the default order of the joints is 3,2,1,4,5,6
@@ -16,9 +17,33 @@ clc;
 % 7. -2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439 place
 % 8. release
 
+% q312456
+% -2.5973 -0.3525 -1.0399 -0.3405 1.1689 0.0005 % picking pose
+% q1:6
+% -2.0399 -1.9081 -1.6591 -0.6422 1.5333 -0.4319 % picking pose
+% -0.2974 -0.8499 -1.5208 -0.4375 1.2556 -1.6255 % picking pose
+% -1.5024 -2.0525 -1.5782 -1.1746 1.5836 -0.7342 % downward placing pose
+%  1.6528 -2.2856 -1.4590 -0.2505 1.4778 -0.5935 % picking prep pose for p6
+
+% in q123456
+% 1.5432 -1.5969 -1.7967 -1.0931 1.4739 -0.5848 % picking prep
+% 1.0220 -1.4307 -1.8019 -0.6677 1.4741 -0.5839 % picking pose
+% return to picking prep
+% -1.2010 -1.9713 -1.5782 -1.5572 1.5840 1.1849 % placing prep
+% -1.5025 -2.0525 -1.5782 -1.1747 1.5836 -0.7342 % placing pose
+% 
+
+
+
+
 %% tutorial source: 
 % https://canvas.uts.edu.au/courses/27375/pages/instructions-for-using-a-real-ur3
 % https://www.youtube.com/watch?v=3ugBHAXPOMg
+
+%% Notes
+% You MUST run this script per section (via Run Section). This is due to
+% Matlab reading through the script quicker than the robot can handle. I.e.
+% it will move onto the next section before the action is performed.
 
 %% Connect
 
@@ -98,7 +123,7 @@ sendGoal(client,goal);
 
  
 
-%% Position 2  move towards orange (distance away)
+%% Position 2  move toward orange
 
 jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
 
@@ -130,7 +155,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 5; % This is how many seconds the movement will take
+durationSeconds = 3.5; % This is how many seconds the movement will take
 
  
 
@@ -144,7 +169,9 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [-1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412];
+%                    123:-0.2687807 -2.53073 -2.19911 goes into ground   |   321:-2.19911 -2.53073 -0.2687807
+% nextJointState_123456 = [-2.5973 -0.3525 -1.0399 -0.3405 1.5145 0.0005];
+nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 -0.5848];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -162,7 +189,7 @@ sendGoal(client,goal);
 
  
 
-%% Position 3 move into orange
+%% Position 3 go to grab orange
 
 jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
 
@@ -194,7 +221,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 5; % This is how many seconds the movement will take
+durationSeconds = 3.5; % This is how many seconds the movement will take
 
  
 
@@ -208,7 +235,12 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [-0.2687807 -2.53073 -2.19911 -0.2687807 1.44862 -0.593412];
+% to place orange/mandarin
+%                        -1.5708 -1.67552 -2.19911
+%    downward placement       [-1.5782 -2.0525 -1.5024 -1.1746 1.5836 -0.7342]
+%    original placement       [-2.19911 -1.67552 -1.5708 0.0523599 1.44862 -0.593412]
+% nextJointState_123456 = [-1.5782 -2.0525 -1.5024 -1.1746 1.5836 -0.7342];
+nextJointState_123456 = [-1.8260 -1.3205 1.0219 -0.8673 1.4747 -0.5839];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -228,7 +260,7 @@ sendGoal(client,goal);
 %% Position 4 Grip
 
 [gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
-gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+gripperMsg.Data = 0.3; % 0.5 is open, -0.5 is closed
 send(gripperPub, gripperMsg);
 
 
@@ -264,7 +296,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 5; % This is how many seconds the movement will take
+durationSeconds = 4; % This is how many seconds the movement will take
 
  
 
@@ -277,8 +309,11 @@ startJointSend.TimeFromStart = rosduration(0);
       
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
+% angled place pose
+% nextJointState_123456 = [-1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412];
 
-nextJointState_123456 = [-1.5708 -1.67552 -2.19911 0.0523599 1.44862 -0.593412];
+% move away back to grab prep pose
+nextJointState_123456 = [-1.7967 -1.5969 1.5432 -1.0931 1.4739 1.1848];
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -294,7 +329,7 @@ goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp +
 
 sendGoal(client,goal);
 
-%% Position 6 prep to place
+%% Position 6 move to place
 
 jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
 
@@ -326,7 +361,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 5; % This is how many seconds the movement will take
+durationSeconds = 3; % This is how many seconds the movement will take
 
  
 
@@ -340,7 +375,11 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [-0.383972 -1.88496 1.02974 -0.279253 1.44862 -0.593412];
+% nextJointState_123456 = [-1.4593 -1.88496 1.02974 -0.279253 1.44862 -0.593412]; % pick up pose
+
+% prep for placement pose
+nextJointState_123456 = [-1.5782 -1.9713 -1.2010 -1.5572 1.5840 1.1849];
+
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -357,7 +396,7 @@ goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp +
 sendGoal(client,goal);
 
 
-%% Position 7 place
+%% Position 7 place orange
 
 jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
 
@@ -389,7 +428,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 5; % This is how many seconds the movement will take
+durationSeconds = 4; % This is how many seconds the movement will take
 
  
 
@@ -403,7 +442,11 @@ startJointSend.TimeFromStart = rosduration(0);
 
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 
-nextJointState_123456 = [-2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439];
+% nextJointState_123456 = [-2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439];
+
+% placement pose
+nextJointState_123456 = [-1.5782 -2.0525 -1.5024 -1.1746 1.5836 1.1848]; 
+
 
 endJointSend.Positions = nextJointState_123456;
 
@@ -420,6 +463,10 @@ goal.Trajectory.Header.Stamp = jointStateSubscriber.LatestMessage.Header.Stamp +
 sendGoal(client,goal);
 
 %% Position 8 Release Grip
+[gripperPub, gripperMsg]= rospublisher('/onrobot_rg2/joint_position_controller/command');
+gripperMsg.Data = 0.5; % 0.5 is open, -0.5 is closed
+send(gripperPub, gripperMsg);
+
 
 
 
