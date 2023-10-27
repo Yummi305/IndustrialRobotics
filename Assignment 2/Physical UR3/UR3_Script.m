@@ -155,7 +155,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 3.5; % This is how many seconds the movement will take
+durationSeconds = 2.5; % This is how many seconds the movement will take
 
  
 
@@ -221,7 +221,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 3.5; % This is how many seconds the movement will take
+durationSeconds = 2; % This is how many seconds the movement will take
 
  
 
@@ -296,7 +296,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 4; % This is how many seconds the movement will take
+durationSeconds = 2; % This is how many seconds the movement will take
 
  
 
@@ -361,7 +361,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 3; % This is how many seconds the movement will take
+durationSeconds = 2.5; % This is how many seconds the movement will take
 
  
 
@@ -428,7 +428,7 @@ goal.GoalTimeTolerance = rosduration(0.05);
 
 bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
 
-durationSeconds = 4; % This is how many seconds the movement will take
+durationSeconds = 3; % This is how many seconds the movement will take
 
  
 
@@ -445,7 +445,7 @@ endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 % nextJointState_123456 = [-2.42601 -1.88496 1.02974 -0.488692 1.44862 -1.3439];
 
 % placement pose
-nextJointState_123456 = [-1.5782 -2.0525 -1.5024 -1.1746 1.5836 1.1848]; 
+nextJointState_123456 = [-1.5781 -2.2595 -1.6502 -0.8197 1.5829 1.1845]; 
 
 
 endJointSend.Positions = nextJointState_123456;
