@@ -91,7 +91,7 @@ classdef RobotFunctions
 function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
-
+            collisionCheck = CollisionFunctions();
             %% Robot1 end effector direction
             if (endEffDirection == 1)
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
@@ -183,16 +183,20 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Animation of Robot
                     robot.model.animate(qMatrix(i,:));
                     robot2.model.animate(qMatrix2(i,:));
-
+                    
                     % Gripper base transform for UR3.
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);%z0.0612
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);%z0.0612
-
+                    point = pos1(1:3, 4);
+                    
                     % Gripper base transform for Panda.
                     pos3 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
                     pos4 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
 
-                    
+                    if collisionCheck.collisionCheckGrip(robot2, point) % if robot2 tries to move into robot1
+                        disp('Collision Detected!');
+                        break %break loop and stop motion
+                    end
                     g_1.model.base = pos1; 
                     g_2.model.base = pos2; 
                     g_1.model.animate(g_1.model.getpos());
@@ -202,7 +206,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     g_4.model.base = pos4; 
                     g_3.model.animate(g_3.model.getpos());
                     g_4.model.animate(g_4.model.getpos());
-
+                    
+                        
 
                     %% gripper
 
@@ -218,7 +223,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         g_3.model.animate(qPath3(i,:));
                         g_4.model.animate(qPath4(i,:)); 
                     end
-
+                    
                     % Apply transformation to objects vertices to visualise movement
                     if holdingObject
                         transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
