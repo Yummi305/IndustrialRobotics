@@ -237,12 +237,12 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Need to add check if eStop pressed in GUI or
                     % physical.
                     
-                    if eStop == 1
-
-                        RobotFunctions.eStop();
-
-                    else
-                    end
+                    % if eStop == 1
+                    % 
+                    %     RobotFunctions.eStop();
+                    % 
+                    % else
+                    % end
 
 
 
