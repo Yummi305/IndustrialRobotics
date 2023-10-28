@@ -234,12 +234,78 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         set(payload2,'Vertices',transfromedVert(:,1:3));
                     end
 
+                    % Need to add check if eStop pressed in GUI or
+                    % physical.
+                    
+                    if eStop == 1
+
+                        RobotFunctions.eStop();
+
+                    else
+                    end
+
+
+
                     drawnow();
                 end
             
             end
 
+    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+        
+       
+        StopSteps =  1000; % pause for maximum 1 min before timeout error
+       
 
+        if stoprequest == 1
+
+        % Close Gripper
+
+        qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
+        qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
+        qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
+        qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
+        qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
+        qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
+
+        
+
+        % Open Gripper
+
+        
+        for i = 1:StopSteps
+
+                robot1.model.animate(qPathStop_R1(i,:));
+                g_1.model.animate(qPathStop_G1(i,:));
+                g_2.model.animate(qPathStop_G2(i,:)); 
+                robot2.model.animate(qPathStop_R2(i,:));
+                g_3.model.animate(qPathStop_G3(i,:));
+                g_4.model.animate(qPathStop_G4(i,:));
+    
+                drawnow();
+    
+                StopSteps = StopStepCounter;
+
+          if StopStepCounter == 999
+            disp ('Operation timed our after 1 minute idle');
+            disp ('Forced restart required....');
+            pause (1000)
+          else
+
+              
+
+          end
+                    pause(0.06);
+
+        end
+
+        else
+
+            disp ('eStop checked');
+
+        
+        end
+    end
 
 
 
