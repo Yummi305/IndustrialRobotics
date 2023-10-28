@@ -2,7 +2,12 @@
 clc;
 clf;
 clear;
-close all;
+% close all;
+
+%% Testing mode toggle
+harvest_toggle = true;
+QA_toggle = true;
+
 %% Create instance of Robot Functions Class in order to access functions
 robotFunctions = RobotFunctions();
 
@@ -182,17 +187,18 @@ pos4 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,0.0127,0.05)*trotx(-pi/2
 g3 = GripRight(pos3); % initiate right gripper
 g4 = GripLeft(pos4); % initial left gripper 
 
-
+clc;
 robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
-%% animate simulated collision
+%% home robots
 robotFunctions.MoveRobot(QA,[-0.33,-0.8,1.145],40,0,false,0,0,g3,g4,2); %QA home pos
-% robotFunctions.MoveRobot(QA,[-0.6,-0.4,.6],40,0,false,0,2,g3,g4,2); % QA collision pos
 
 robotFunctions.MoveRobot(harvestBot, [-0.1942, 0, 0.7142],50,0,false,0,0,g1,g2,2);  %harvest home pos
-robotFunctions.MoveRobot(harvestBot, [-0.68, -.322, 0.36],50,0,false,0,2,g1,g2,2);  %harvest home pos
+robotFunctions.MoveRobot(harvestBot, [-0.68, -.322, 0.36],50,0,false,0,2,g1,g2,2);  %harvest recording start pos
+%% 
+
 % robotFunctions.MoveRobot(harvestBot,[-0.5, -.2, 0.45],50,0,false,0,3,g1,g2,2); %harvest coll pos
 % robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,
 % robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
-robotFunctions.MoveTwoRobots(QA,[-0.699,-0.4,.91],50,0,false,0,2,g3,g4,2, ...
+robotFunctions.MoveTwoRobots(QA,[-0.679,-0.4,.68],50,0,false,0,2,g3,g4,2, ...
                             harvestBot,[-0.68, -.2, 0.443],0,false,0,3,g1,g2,2);

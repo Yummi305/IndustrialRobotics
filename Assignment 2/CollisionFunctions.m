@@ -158,11 +158,11 @@ classdef CollisionFunctions
 %             gripZ;
             if (strcmp(robot.plyFileNameStem, 'ColouredPanda'))
 %                 endTr = endAn(1:11);
-                gripXY = 7*0.0127;
+                gripXY = 9*0.0127;
                 gripZ = .05;
             end
             if (strcmp(robot.plyFileNameStem, 'LinearUR3'))
-                gripXY = 7*0.0127;
+                gripXY = 9*0.0127;
                 gripZ = 0.0612;
             end
             endTr = SE3(robot.model.fkine(endAn).T*transl(0,0, gripZ+.18)); % convert end effector angles to transform and move to end of gripper
