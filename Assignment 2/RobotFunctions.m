@@ -259,7 +259,6 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
         if stoprequest == 1
 
-        % Close Gripper
 
         qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
         qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
@@ -270,9 +269,6 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
         
 
-        % Open Gripper
-
-        
         for i = 1:StopSteps
 
                 robot1.model.animate(qPathStop_R1(i,:));
@@ -293,7 +289,6 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
           else
 
               
-
           end
                     pause(0.06);
 
