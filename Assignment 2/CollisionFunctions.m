@@ -10,14 +10,14 @@ classdef CollisionFunctions
         centreJoints;
     end
     methods
-        function self = CollisionFunctions(robot) % generate ellipses around links at current pos.
-            self.updateEllips(robot);
-            if (strcmp(robot.plyFileNameStem, 'LinearUR3'))
-                self.linkLeng = [0 .128 .2435 .131 .2132 .0853 .131];
-            end
-            if strcmp(robot.plyFileNameStem, 'ColouredPanda')
-                self.linkLeng = [.333 0 .3160 0 .085 0 .385 0 0 .088 0];
-            end
+        function self = CollisionFunctions() % generate ellipses around links at current pos.
+%             self.updateEllips(robot);
+%             if (strcmp(robot.plyFileNameStem, 'LinearUR3'))
+%                 self.linkLeng = [0 .128 .2435 .131 .2132 .0853 .131];
+%             end
+%             if strcmp(robot.plyFileNameStem, 'ColouredPanda')
+%                 self.linkLeng = [.333 0 .3160 0 .085 0 .385 0 0 .088 0];
+%             end
             
 %             if exist(self.JointEllipse)
 %                 disp('prior surface found');
@@ -74,17 +74,17 @@ classdef CollisionFunctions
             %delete(JointEllipse);
         end
 
-        function visualiseEllips(self, robot, dur)
+        function visualiseEllips(self, robot)
             self.updateEllips(robot);
             for j = 1:length(self.centreJoints)
-                self.JointEllipse(j) = mesh(self.ellipX, self.ellipY, self.ellipZ); % generates the ellipse
+                self.JointEllipse(j) = surf(self.ellipX, self.ellipY, self.ellipZ); % generates the ellipse
                 Jrot = jointTr(j).tr2rpy;
                 rotate(self.JointEllipse(j), [0 0 1], Jrot(3), self.centreJoints(j));
                 rotate(self.JointEllipse(j), [0 1 0], Jrot(2), self.centreJoints(j));
                 rotate(self.JointEllipse(j), [1 0 0], Jrot(1), self.centreJoints(j));
                
             end
-            pause(dur)
+            pause()
             delete(self.JointEllipse);
         end
         
@@ -120,15 +120,17 @@ classdef CollisionFunctions
             
             for j = 1:length(self.centreJoints)
                 
-                [self.ellipX, self.ellipY, self.ellipZ] = ellipsoid(self.centreJoints{j}(1), self.centreJoints{j}(2), self.centreJoints{j}(3), self.jointX, self.jointY, jointLinks(j).d/2); % generate points per link
-%                 self.JointEllipse(j) = mesh(self.ellipX, self.ellipY, self.ellipZ); % generates the ellipse
+                [self.ellipX, self.ellipY, self.ellipZ] = ellipsoid(self.centreJoints{j}(1), self.centreJoints{j}(2), self.centreJoints{j}(3), self.jointX, self.jointY, jointLinks(j).d/2) % generate points per link
+                self.JointEllipse(j) = surf(self.ellipX, self.ellipY, self.ellipZ); % generates the ellipse
 %                 Jrot = jointTr(j).tr2rpy;
 %                 rotate(self.JointEllipse(j), [0 0 1], Jrot(3));
 %                 rotate(self.JointEllipse(j), [0 1 0], Jrot(2));
 %                 rotate(self.JointEllipse(j), [1 0 0], Jrot(1));
-                
+               
+%                 delete(self.JointEllipse)
                 
             end
+             pause();
         end
 
         function outp = collisionCheckSelf(self, robot, Q) % check collision between end effector at point Q and links
@@ -156,14 +158,14 @@ classdef CollisionFunctions
 %             gripZ;
             if (strcmp(robot.plyFileNameStem, 'ColouredPanda'))
 %                 endTr = endAn(1:11);
-                gripXY = 2*0.0127;
-                gripZ = 5*.05;
+                gripXY = 9*0.0127;
+                gripZ = .05;
             end
             if (strcmp(robot.plyFileNameStem, 'LinearUR3'))
-                gripXY = 2*0.0127;
-                gripZ = 5*0.0612;
+                gripXY = 9*0.0127;
+                gripZ = 0.0612;
             end
-            endTr = SE3(robot.model.fkine(endAn).T*transl(0,0, gripZ)); % convert end effector angles to transform and move to end of gripper
+            endTr = SE3(robot.model.fkine(endAn).T*transl(0,0, gripZ+.18)); % convert end effector angles to transform and move to end of gripper
 
             % Visualises the ellipsoid then deletes it
 %             [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), gripXY, gripXY, gripZ);
@@ -172,14 +174,14 @@ classdef CollisionFunctions
 %             rotate(showElp, [0 0 1], Jrot(3), [endTr.t(1), endTr.t(2), endTr.t(3)]);
 %             rotate(showElp, [0 1 0], Jrot(2), [endTr.t(1), endTr.t(2), endTr.t(3)]);
 %             rotate(showElp, [1 0 0], Jrot(1), [endTr.t(1), endTr.t(2), endTr.t(3)]);
-%             pause()
+%             pause(.3)
 %             delete(showElp)
             if ~isrow(P)
                 P = P';
             end
-
+            
             place = (P - endTr.t');
-            result = place * ([gripXY^-2, gripXY^-2, gripZ^-2].*eye(3)) * place';
+            result = place * ([gripXY^-2, gripXY^-2, (5*gripZ)^-2].*eye(3)) * place';
             if result <= 1
                 outp = true; % return true if collision detected
                 return
