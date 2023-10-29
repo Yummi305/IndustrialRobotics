@@ -38,7 +38,15 @@ classdef FruitLoopSystem
             PlaceObject('fence.ply',[-1.4,-2,0.01]);
             PlaceObject('fence.ply',[-0.15,-2,0.01]);
             PlaceObject('fence.ply',[1.1,-2,0.01]);
-            
+
+
+            % Read environment textures
+            sign1 = imread ('sign1.png'); % Wall Image
+            sign2 = imread ('sign2.png'); % Wall Image
+            % Warning signs
+            surf([0,0.8;0,0.8],[-2.05,-2.05;-2.05,-2.052],[0.4,0.4;0.02,0.02],'CData',sign1,'FaceColor','texturemap'); % Robot
+            surf([-1,-0.2;-1,-0.2],[-2.05,-2.05;-2.05,-2.052],[0.4,0.4;0.02,0.02],'CData',sign2,'FaceColor','texturemap'); % PPE
+
             % Safety cones and Light curtain
             PlaceObject('cone.ply',[-1.7,0.7,0.01]);
             PlaceObject('LightCurtain_NegY.ply',[-1.7,0.7,0.25]);
