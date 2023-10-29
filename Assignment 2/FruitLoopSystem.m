@@ -33,15 +33,28 @@ classdef FruitLoopSystem
             PlaceObject('fence.ply',[-1.4,1,0.01]);
             PlaceObject('fence.ply',[-0.15,1,0.01]);
             PlaceObject('fence.ply',[1.1,1,0.01]);
+
+            % Guard rails to secure the zone from external hazards
+            PlaceObject('fence.ply',[-1.4,-2,0.01]);
+            PlaceObject('fence.ply',[-0.15,-2,0.01]);
+            PlaceObject('fence.ply',[1.1,-2,0.01]);
             
-            % Safety cones
-            PlaceObject('cone.ply',[-1.2,0,0.01]);
-            PlaceObject('cone.ply',[0.5,0,0.01]);
-            PlaceObject('cone.ply',[0.5,-1.4,0.01]);
-            PlaceObject('cone.ply',[-1.2,-1.4,0.01]);
+            % Safety cones and Light curtain
+            PlaceObject('cone.ply',[-1.7,0.7,0.01]);
+            PlaceObject('LightCurtain_NegY.ply',[-1.7,0.7,0.25]);
+
+            PlaceObject('cone.ply',[-1.7,-1.8,0.01]);
+            PlaceObject('LightCurtain_PosY.ply',[-1.7,-1.8,0.25]);    
+
+            PlaceObject('cone.ply',[1,0.7,0.01]);
+            PlaceObject('LightCurtain_NegY.ply',[1,0.7,0.25]);
             
-            PlaceObject('fireExtinguisherElevated.ply', [-1.8,0.65,0.01]);
-            PlaceObject('emergencyStopButton.PLY',[-2,-1.8,0.01]);
+            PlaceObject('cone.ply',[1,-1.8,0.01]);
+            PlaceObject('LightCurtain_PosY.ply',[1,-1.8,0.25]);
+  
+            
+            PlaceObject('fireExtinguisherElevated.ply',[-2,0.65,0.01]);
+            PlaceObject('emergencyStopButton.PLY',[-2,0,0.01]);
             
             % Unsorted Mandarins crate
             PlaceObject('fruit_crate_unsorted.ply',[-0.7,-0.35,0.01]);
