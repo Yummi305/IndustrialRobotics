@@ -187,7 +187,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Gripper base transform for UR3.
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);%z0.0612
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);%z0.0612
-                    point = pos1(1:3, 4);
+                    point = (pos1(1:3, 4)+pos2(1:3, 4))/2;
                     
                     % Gripper base transform for Panda.
                     pos3 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
@@ -195,7 +195,14 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     if collisionCheck.collisionCheckGrip(robot2, point) % if robot2 tries to move into robot1
                         disp('Collision Detected!');
-                        break %break loop and stop motion
+%                         break %break loop and stop motion
+                        
+                        % Avoiding collision
+                        % move away from colliding robot/object A*inv(B)*A
+                        % => MoveRobot(robot2, [robot2*inv(point)*robot2] moves directly away
+                        % remake rest of qmatrix
+                        
+
                     end
                     g_1.model.base = pos1; 
                     g_2.model.base = pos2; 

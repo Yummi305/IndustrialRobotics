@@ -162,17 +162,17 @@ end
 
 %% Generate LinearUR3
 % Initialise LinearUR3
-harvestBot = LinearUR3(transl(0,0,0.02));
-harvestBot.model.getpos()
+% harvestBot = LinearUR3(transl(0,0,0.02));
+% harvestBot.model.getpos()
 
 %% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on UR3 end effector.
-pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
-pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
-g1 = GripRight(pos1); % initiate right gripper
-g2 = GripLeft(pos2); % initial left gripper
+% pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+% pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+% g1 = GripRight(pos1); % initiate right gripper
+% g2 = GripLeft(pos2); % initial left gripper
 
-robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
+% robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
 %% Generate Franka Emika (Panda)
 QA = Panda(transl(-0.6,-0.8,0.02));
@@ -191,14 +191,150 @@ clc;
 robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
 %% home robots
-robotFunctions.MoveRobot(QA,[-0.33,-0.8,1.145],40,0,false,0,0,g3,g4,2); %QA home pos
-
-robotFunctions.MoveRobot(harvestBot, [-0.1942, 0, 0.7142],50,0,false,0,0,g1,g2,2);  %harvest home pos
-robotFunctions.MoveRobot(harvestBot, [-0.68, -.322, 0.36],50,0,false,0,2,g1,g2,2);  %harvest recording start pos
+% robotFunctions.MoveRobot(QA,[-0.33,-0.8,1.145],40,0,false,0,0,g3,g4,2); %QA home pos
+% 
+% robotFunctions.MoveRobot(harvestBot, [-0.1942, 0, 0.7142],50,0,false,0,0,g1,g2,2);  %harvest home pos
+% robotFunctions.MoveRobot(harvestBot, [-0.68, -.322, 0.36],50,0,false,0,2,g1,g2,2);  %harvest recording start pos
 %% 
 
 % robotFunctions.MoveRobot(harvestBot,[-0.5, -.2, 0.45],50,0,false,0,3,g1,g2,2); %harvest coll pos
 % robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,
 % robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
-robotFunctions.MoveTwoRobots(QA,[-0.679,-0.4,.68],50,0,false,0,2,g3,g4,2, ...
-                            harvestBot,[-0.68, -.2, 0.443],0,false,0,3,g1,g2,2);
+% robotFunctions.MoveTwoRobots(harvestBot,[-0.68, -.2, 0.443],50,0,false,0,3,g1,g2,2, ...
+%                             QA,[-0.679,-0.4,.68],0,false,0,2,g3,g4,2);
+
+%% Franka self collision test
+clc
+% robotFunctions.MoveRobot(QA,[-1.47,-1.43,.55],40,0,false,0,3,g3,g4,2);
+% robotFunctions.MoveRobot(QA, [-0.62, -1.67, .45], 40,0,false,0,2,g3,g4,2);
+testmove(QA,[-.53,-.17,.45],80,0,false,0,2,g3,g4,2);
+clc
+testmove(QA, [-1.13, -.77, .25], 80,0,false,0,2,g3,g4,2);
+clc
+% robotFunctions.MoveRobot(QA,[-1.11,-1.4,.55],40,0,false,0,2,g3,g4,2);
+testmove(QA, [.807, -.47, .35], 100,0,false,0,1,g3,g4,2);
+
+
+% test movement function with collision checking
+function testmove(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
+if (endEffDirection == 1)
+    endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
+elseif (endEffDirection == 2)
+    endMove = transl(position) * trotx(pi); % To position end effector to point towards z axis in negative direction
+elseif (endEffDirection == 3)
+    endMove = transl(position) * trotx(pi/2); % To position end effector point in towards y axis in negative direction
+else
+    endMove = transl(position) * troty(-pi/2); % To position end effector to point towards x axis in negative direction
+end
+q0 = robot.model.getpos();
+pose = robot.model.fkine(q0);
+q1 = robot.model.ikcon(pose, q0);
+q2 = robot.model.ikcon(endMove, q0);
+collF = CollisionFunctions();
+s = lspb(0,1,steps);  % First, create the scalar function
+qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
+for i = 1:steps
+    qMatrix(i,:) = (1-s(i))*q1 + s(i)*q2;
+end
+
+for i = 1:steps
+    % Animation of Robot
+    if collF.collisionCheckSelf(robot, qMatrix(i, :))
+        disp('(potential) Collision! Avoiding...')
+        poseNow = robot.model.getpos();
+        pointNow = robot.model.fkine(poseNow).T;
+        pointNext = robot.model.fkine(qMatrix(i,:));
+        pointAdj = pointNow;
+        pointAdj = SE3(pointAdj(1:3, 4));
+        invNext = SE3(inv(pointNext));
+        pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj); % aim directly away from collision
+        poseAvoid = robot.model.ikcon(pointAvoid, poseNow);
+        %         robot.model.animate(poseAvoid); % move the robot away from collision
+        
+        
+        sideStep = 100;
+        pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj);
+        q1 = robot.model.ikcon(pointNow,poseNow);
+        q2 = robot.model.ikcon(pointAvoid, poseNow);
+        s = lspb(0,1,sideStep);  % First, create the scalar function
+        newqMatrix = nan(sideStep,length(robot.model.links));  % Create memory allocation for variables
+        newqMatrix = (1-s)*q1 + s*q2;
+        disp('new traj')
+        for a = 1:sideStep
+            robot.model.animate(newqMatrix(a,:));
+            
+%             robot.model.getpos();
+
+            %         pause()
+            pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+            pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+            g_1.model.base = pos1;
+            g_2.model.base = pos2;
+            g_1.model.animate(g_1.model.getpos());
+            g_2.model.animate(g_2.model.getpos());
+            drawnow()
+        end
+        q0 = robot.model.getpos();
+        pose = robot.model.fkine(q0);
+        q1 = robot.model.ikcon(pose, q0);
+        q2 = robot.model.ikcon(endMove, q0);
+        
+        s = lspb(0,1,steps);  % First, create the scalar function
+        qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
+        qMatrix = (1-s)*q1 + s*q2;
+%         for a = 1:steps
+%             qMatrix(a,:) = (1-s(a))*q1 + s(a)*q2;
+%         end
+        disp('end avoidance')
+        
+        for b = 1:i
+            robot.model.animate(qMatrix(b,:));
+            
+%             robot.model.getpos();
+
+            %         pause()
+            pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+            pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+            g_1.model.base = pos1;
+            g_2.model.base = pos2;
+            g_1.model.animate(g_1.model.getpos());
+            g_2.model.animate(g_2.model.getpos());
+            drawnow()
+        end
+        disp('original loop matchup')
+        
+        
+    end
+%     qMatrix(i,:) - robot.model.getpos()
+    
+    robot.model.animate(qMatrix(i,:));
+    
+    % Gripper base transform for UR3.
+    pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+    pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+
+
+    g_1.model.base = pos1;
+    g_2.model.base = pos2;
+    g_1.model.animate(g_1.model.getpos());
+    g_2.model.animate(g_2.model.getpos());
+
+    %         if grip == 1 || grip == 2
+    %             % Gripper open or close if necessary
+    %             g_1.model.animate(qPath1(i,:));
+    %             g_2.model.animate(qPath2(i,:));
+    %         end
+
+    % Apply transformation to objects vertices to visualise movement
+    if holdingObject
+        transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
+        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+        transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+        set(payload,'Vertices',transfromedVert(:,1:3));
+    end
+    drawnow();
+end
+end
+
+
+
