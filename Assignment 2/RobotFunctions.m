@@ -130,13 +130,26 @@ classdef RobotFunctions
 function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2, stoprequest)
             % move end effector to specified location and carry bricks if required
             
-            if stoprequest ==  true
+            
+            %% Check eStop and buttons
+            [eStopValue, ResumeValue, SafetyValue] = RobotFunctions.Check_eStop(app.estop,app.safety,app.resume)
 
-                disp('estop active check')
+            if eStopValue == true
 
-            else
+                Harvest_pos = robot.model.getpos();
+                    Grip1_pos = g_1.model.getpos();
+                    Grip2_pos = g_2.model.getpos();
+                    Panda_pos = robot2.model.getpos();
+                    Grip3_pos = g_3.model.getpos();
+                    Grip4_pos = g_4.model.getpos();
+
+                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,ResumeValue,SafetyValue)
+
+                    disp ('Stop success, Return to loop')
 
             end
+
+            
             
             % Obtain robots current position and desired position to form qMatrix
             collisionCheck = CollisionFunctions();
@@ -333,7 +346,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,resumerequest) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,resumerequest,safetycheck) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
         
        
         StopSteps =  1000; % pause for maximum 1 min before timeout error
