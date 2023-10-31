@@ -386,9 +386,35 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
         
         end
     
+%% Check eStop's Value to see if changed in app.
+
+        function [eStopValue, ResumeValue, SafetyValue] = Check_eStop(check_estop,check_safety,check_resume)
+
+            
+                eStopValue = check_estop;
+                ResumeValue = check_resume;
+                SafetyValue = check_safety;
+
+                disp ('estop, safety and resume checked')
+
+                if (eStopValue == 1 || ResumeValue == 1)
+                    
+                disp('STOP/RESUME change in RobotFunction')
+
+                else
+
+                end
+
+                if (SafetyValue == 0 && eStopValue == 1)
+                    
+                disp('Saftey Switch off... ready to resume')
+
+                else
+
+                end
 
 
-
+        end
 
         %% GripperMovement
         function GripperMove(g1,g2,goal) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
