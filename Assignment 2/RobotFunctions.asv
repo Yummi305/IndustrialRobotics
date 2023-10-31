@@ -2,9 +2,18 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip) %,estop,resume,stopposition) estop test
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
+            
+            %if estop = true
+            
+            %disp('estop press recognised in MoveRobot')
+
+            %end
+
+
+
             if (endEffDirection == 1)
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
             elseif (endEffDirection == 2)
@@ -88,10 +97,22 @@ classdef RobotFunctions
   
 
 %% Dual Robot Movement
-function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
+function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2, stoprequest)
             % move end effector to specified location and carry bricks if required
-            % Obtain robots current position and desired position to form qMatrix
+            
+            if stoprequest ==  true
 
+                disp('estop active in MovetwoRobots function')
+
+                RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,estop)
+
+                disp ('estop activation success')
+
+            else
+            end
+            
+            % Obtain robots current position and desired position to form qMatrix
+            collisionCheck = CollisionFunctions();
             %% Robot1 end effector direction
             if (endEffDirection == 1)
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
@@ -183,16 +204,27 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Animation of Robot
                     robot.model.animate(qMatrix(i,:));
                     robot2.model.animate(qMatrix2(i,:));
-
+                    
                     % Gripper base transform for UR3.
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);%z0.0612
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);%z0.0612
-
+                    point = (pos1(1:3, 4)+pos2(1:3, 4))/2;
+                    
                     % Gripper base transform for Panda.
                     pos3 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
                     pos4 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
 
-                    
+                    if collisionCheck.collisionCheckGrip(robot2, point) % if robot2 tries to move into robot1
+                        disp('Collision Detected!');
+%                         break %break loop and stop motion
+                        
+                        % Avoiding collision
+                        % move away from colliding robot/object A*inv(B)*A
+                        % => MoveRobot(robot2, [robot2*inv(point)*robot2] moves directly away
+                        % remake rest of qmatrix
+                        
+
+                    end
                     g_1.model.base = pos1; 
                     g_2.model.base = pos2; 
                     g_1.model.animate(g_1.model.getpos());
@@ -202,7 +234,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     g_4.model.base = pos4; 
                     g_3.model.animate(g_3.model.getpos());
                     g_4.model.animate(g_4.model.getpos());
-
+                    
+                        
 
                     %% gripper
 
@@ -218,7 +251,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         g_3.model.animate(qPath3(i,:));
                         g_4.model.animate(qPath4(i,:)); 
                     end
-
+                    
                     % Apply transformation to objects vertices to visualise movement
                     if holdingObject
                         transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
@@ -251,15 +284,13 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,resumerequest) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
         
        
         StopSteps =  1000; % pause for maximum 1 min before timeout error
        
 
-        if stoprequest == 1
-
-        % Close Gripper
+        if stoprequest == true
 
         qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
         qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
@@ -270,9 +301,6 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
         
 
-        % Open Gripper
-
-        
         for i = 1:StopSteps
 
                 robot1.model.animate(qPathStop_R1(i,:));
@@ -292,10 +320,19 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             pause (1000)
           else
 
-              
+              if resumerequest == true
 
+                  StopSteps = 1000;
+
+                  resume = false;
+
+              else
+
+              end
+
+              
           end
-                    pause(0.06);
+                    pause(0.01); %0.06 = 60s
 
         end
 

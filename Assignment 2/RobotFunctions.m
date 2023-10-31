@@ -2,9 +2,18 @@ classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
     methods (Static)  
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip) %,estop,resume,stopposition) estop test
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
+            
+            %if estop = true
+            
+            %disp('estop press recognised in MoveRobot')
+
+            %end
+
+
+
             if (endEffDirection == 1)
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
             elseif (endEffDirection == 2)
@@ -88,8 +97,20 @@ classdef RobotFunctions
   
 
 %% Dual Robot Movement
-function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
+function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2, stoprequest)
             % move end effector to specified location and carry bricks if required
+            
+            if stoprequest ==  true
+
+                disp('estop active in MovetwoRobots function')
+
+                RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,estop)
+
+                disp ('estop activation success')
+
+            else
+            end
+            
             % Obtain robots current position and desired position to form qMatrix
             collisionCheck = CollisionFunctions();
             %% Robot1 end effector direction
@@ -263,14 +284,13 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,resumerequest) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
         
        
         StopSteps =  1000; % pause for maximum 1 min before timeout error
        
 
-        if stoprequest == 1
-
+        if stoprequest == true
 
         qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
         qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
@@ -280,7 +300,6 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
         qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
 
         
-
         for i = 1:StopSteps
 
                 robot1.model.animate(qPathStop_R1(i,:));
@@ -300,9 +319,19 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             pause (1000)
           else
 
+              if resumerequest == true
+
+                  StopSteps = 1000;
+
+                  resume = false;
+
+              else
+
+              end
+
               
           end
-                    pause(0.06);
+                    pause(0.01); %0.06 = 60s
 
         end
 
