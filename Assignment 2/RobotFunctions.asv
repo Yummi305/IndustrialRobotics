@@ -132,20 +132,23 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             
             %% Check eStop and buttons
-            [eStopValue, ResumeValue, SafetyValue] = RobotFunctions.Check_eStop(app.estop,app.safety,app.resume)
+            [eStopValue, ResumeValue, SafetyValue] = RobotFunctions.Check_eStop(app.estop,app.safety,app.resume);
 
             if eStopValue == true
 
-                Harvest_pos = robot.model.getpos();
+                    Harvest_pos = robot.model.getpos();
                     Grip1_pos = g_1.model.getpos();
                     Grip2_pos = g_2.model.getpos();
                     Panda_pos = robot2.model.getpos();
                     Grip3_pos = g_3.model.getpos();
                     Grip4_pos = g_4.model.getpos();
 
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,stoprequest,ResumeValue,Safe)
+                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
+
+                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,ResumeValue,StopQs)
 
                     disp ('Stop success, Return to loop')
+            else
 
             end
 
@@ -243,25 +246,24 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 for i = 1:steps
                     % Animation of Robot
 
-                    if stoprequest ==  true
+                    [eStopValue, ResumeValue, SafetyValue] = RobotFunctions.Check_eStop(app.estop,app.safety,app.resume);
 
-                    disp('estop active in MovetwoRobots function loop')
-    
-                    Harvest_pos = robot.model.getpos();
-                    Grip1_pos = g_1.model.getpos();
-                    Grip2_pos = g_2.model.getpos();
-                    Panda_pos = robot2.model.getpos();
-                    Grip3_pos = g_3.model.getpos();
-                    Grip4_pos = g_4.model.getpos();
-
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,stoprequest,0)
-    
-                    disp ('enter teach')
-
-                    pause(5)
-
+                    if eStopValue == true
+        
+                            Harvest_pos = robot.model.getpos();
+                            Grip1_pos = g_1.model.getpos();
+                            Grip2_pos = g_2.model.getpos();
+                            Panda_pos = robot2.model.getpos();
+                            Grip3_pos = g_3.model.getpos();
+                            Grip4_pos = g_4.model.getpos();
+        
+                            StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
+        
+                            RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,ResumeValue,StopQs)
+        
+                            disp ('Stop success, Return to loop')
                     else
-
+        
                     end
 
                     robot.model.animate(qMatrix(i,:));
@@ -346,13 +348,12 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-    function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,resumerequest,safetycheck) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+            function eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,resumerequest,QpositionMat) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
         
        
-        StopSteps =  1000; % pause for maximum 1 min before timeout error
-       
-
         if stoprequest == true
+
+            StopSteps = 1;
 
         qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
         qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
@@ -361,8 +362,9 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
         qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
         qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
 
-        
-        for i = 1:StopSteps
+        for stoprequest = true
+    
+             for i = 1:StopSteps
 
                 robot1.model.animate(qPathStop_R1(i,:));
                 g_1.model.animate(qPathStop_G1(i,:));
@@ -372,30 +374,24 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 g_4.model.animate(qPathStop_G4(i,:));
     
                 drawnow();
+
+                [eStopValue, ResumeValue, SafetyValue] = RobotFunctions.Check_eStop(app.estop,app.safety,app.resume);
+
+                stoprequest = eStopValue;
+
+                if SafetyValue == true
+
+                    disp('Exit to Manual Overide')
+
+                    break
+
+                end
+
+             end
+        end
+        end
     
-             StopStepCounter = StopSteps;
-
-          if StopStepCounter == 999
-            disp ('Operation timed our after 1 minute idle');
-            disp ('Forced restart required....');
-            pause (1000)
-          elseif resumerequest == true
-
-                  StopSteps = 1000;
-
-                  resumerequest = false;
-
-          else
-
-          end
-                pause(0.06); %0.06 = 60s
-              
-        end
-
-        end
-
-            disp ('eStop checked');
-
+         disp('Resume from e-stop')
         
         end
     
