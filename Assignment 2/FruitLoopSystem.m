@@ -98,12 +98,11 @@ classdef FruitLoopSystem
             
             
             %% Tree 2 Mandarins
-            % Tree 2 Mandarin Initial Locaitons
-            tree2_pos = [-0.95, 0.38, 0.42;
-                         -0.9, 0.38, 0.48;
+            tree2_pos = [-0.95, 0.43, 0.47;
+                         -0.9, 0.4, 0.5;
                          -1, 0.38, 0.51;
                          -1.1, 0.3, 0.39];
-            
+
             % Store Mandarin objects and vertices
             tree2_obj = cell(1, size(tree2_pos, 1));
             tree2_verts = cell(1, size(tree2_pos, 1));
@@ -122,7 +121,7 @@ classdef FruitLoopSystem
             % Tree 2 Mandarin Crate Locations
             tree2_crate_pos = [-0.85,-0.37,0.04
                                -0.75,-0.37,0.04; 
-                               -0.65,-0.37,0.04; 
+                               -0.85,-0.37,0.04; 
                                -0.55,-0.37,0.04];
             
             % Tree 1 Mandarin above crate
