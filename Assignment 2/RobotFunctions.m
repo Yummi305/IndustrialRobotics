@@ -1,18 +1,48 @@
 classdef RobotFunctions
     % Class containing functions that facilitate robot movement.
+
+    properties (Access = public)
+        
+        %% eStop
+        estopper;
+        checksafety;
+        nowresume;
+    end
+
+
     methods (Static)  
         %% Robot Movement
         function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip) %,estop,resume,stopposition) estop test
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
             
-            %if estop = true
-            
-            %disp('estop press recognised in MoveRobot')
+            %% eStop Attempt not working yet
 
-            %end
+            % estopper = app.estop;
+            % nowresume = app.resume;
+            % 
+            %         if RobotFunctions.estopper ==  true
+            % 
+            %         disp('estop active in MovetwoRobots function loop')
+            % 
+            %         Harvest_pos = robot.model.getpos();
+            %         Grip1_pos = g_1.model.getpos();
+            %         Grip2_pos = g_2.model.getpos();
+            %         Panda_pos = robot2.model.getpos();
+            %         Grip3_pos = g_3.model.getpos();
+            %         Grip4_pos = g_4.model.getpos();
+            % 
+            %         RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,estopper,nowresume)
+            % 
+            %         disp ('enter teach')
+            % 
+            %         pause(5)
+            % 
+            %         else
+            % 
+            %         end
 
-
+                    %%
 
             if (endEffDirection == 1)
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
