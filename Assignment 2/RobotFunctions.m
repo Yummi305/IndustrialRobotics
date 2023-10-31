@@ -102,13 +102,10 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             if stoprequest ==  true
 
-                disp('estop active in MovetwoRobots function')
-
-                RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,estop)
-
-                disp ('estop activation success')
+                disp('estop active check')
 
             else
+
             end
             
             % Obtain robots current position and desired position to form qMatrix
@@ -202,6 +199,28 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             % Execute the motion
                 for i = 1:steps
                     % Animation of Robot
+
+                    if stoprequest ==  true
+
+                    disp('estop active in MovetwoRobots function loop')
+    
+                    Harvest_pos = robot.model.getpos();
+                    Grip1_pos = g_1.model.getpos();
+                    Grip2_pos = g_2.model.getpos();
+                    Panda_pos = robot2.model.getpos();
+                    Grip3_pos = g_3.model.getpos();
+                    Grip4_pos = g_4.model.getpos();
+
+                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,stoprequest,0)
+    
+                    disp ('enter teach')
+
+                    pause(5)
+
+                    else
+
+                    end
+
                     robot.model.animate(qMatrix(i,:));
                     robot2.model.animate(qMatrix2(i,:));
                     
@@ -311,37 +330,32 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
     
                 drawnow();
     
-                StopSteps = StopStepCounter;
+             StopStepCounter = StopSteps;
 
           if StopStepCounter == 999
             disp ('Operation timed our after 1 minute idle');
             disp ('Forced restart required....');
             pause (1000)
-          else
-
-              if resumerequest == true
+          elseif resumerequest == true
 
                   StopSteps = 1000;
 
-                  resume = false;
+                  resumerequest = false;
 
-              else
+          else
 
-              end
-
-              
           end
-                    pause(0.01); %0.06 = 60s
-
+                pause(0.06); %0.06 = 60s
+              
         end
 
-        else
+        end
 
             disp ('eStop checked');
 
         
         end
-    end
+    
 
 
 
