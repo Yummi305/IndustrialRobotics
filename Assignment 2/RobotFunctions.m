@@ -40,7 +40,9 @@ classdef RobotFunctions
             q1 = robot.model.ikcon(pose, q0);
             q2 = robot.model.ikcon(endMove, q0);
             
-          
+            % Initalise collision functions for use
+            collF = CollisionFunctions();
+            
             % qMatrix calculation - smooth velocity and acceleration profiles
             % Method 1 Quintic Polynomial
 %             qMatrix = jtraj(q1,q2,steps);
@@ -75,6 +77,82 @@ classdef RobotFunctions
 
             % Execute the motion
                 for i = 1:steps
+
+                    % To check for collisions against self and ground
+                    groundCheck = collF.collisionGroundLPI(robot);
+                    selfCheck = collF.collisionCheckSelf(robot, qMatrix(i, :));
+
+                    if selfCheck || groundCheck == 1
+                        disp('(potential) Collision! Avoiding...')
+                        poseNow = robot.model.getpos();
+                        pointNow = robot.model.fkine(poseNow).T;
+                        pointNext = robot.model.fkine(qMatrix(i,:));
+                        pointAdj = pointNow;
+                        pointAdj = SE3(pointAdj(1:3, 4));
+                        invNext = SE3(inv(pointNext));
+                        pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj); % aim directly away from collision
+                        poseAvoid = robot.model.ikcon(pointAvoid, poseNow);
+
+                        sideStep = 30;
+                        q1 = robot.model.ikcon(pointNow,poseNow);
+                        q2 = robot.model.ikcon(pointAvoid, poseNow);
+                        s = lspb(0,1,sideStep);  % First, create the scalar function
+                        newqMatrix = nan(sideStep,length(robot.model.links));  % Create memory allocation for variables
+                        newqMatrix = (1-s)*q1 + s*q2;
+                        % disp('new traj')
+                        for a = 1:sideStep
+                            robot.model.animate(newqMatrix(a,:));
+                            pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+                            pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+                            g_1.model.base = pos1;
+                            g_2.model.base = pos2;
+                            g_1.model.animate(g_1.model.getpos());
+                            g_2.model.animate(g_2.model.getpos());
+
+                            if holdingObject
+                                transMatrix = robot.model.fkine(newqMatrix(a,:)).T; % create transformation matrix of current end effector position
+                                transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                                transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                                set(payload,'Vertices',transfromedVert(:,1:3));
+                            end
+                            drawnow()
+                        end
+
+                        % regenerate new trajectory to endpoint
+                        q0 = robot.model.getpos();
+                        pose = robot.model.fkine(q0);
+                        q1 = robot.model.ikcon(pose, q0);
+                        % To adjust final position upward if input is too low (z is negative)
+                        %       if groundCheck == 1
+                        %             endMove = transl(0,0,.1)*endMove; % adjust endMove upwards if in ground
+                        %         end
+                        q2 = robot.model.ikcon(endMove, q0);
+
+                        s = lspb(0,1,steps);  % First, create the scalar function
+                        qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
+                        qMatrix = (1-s)*q1 + s*q2;
+
+                        % match-up to current iteration in outer for loop
+                        for b = 1:i-1
+                            robot.model.animate(qMatrix(b,:));
+
+                            pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+                            pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+                            g_1.model.base = pos1;
+                            g_2.model.base = pos2;
+                            g_1.model.animate(g_1.model.getpos());
+                            g_2.model.animate(g_2.model.getpos());
+
+                            if holdingObject
+                                transMatrix = robot.model.fkine(qMatrix(b,:)).T; % create transformation matrix of current end effector position
+                                transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                                transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                                set(payload,'Vertices',transfromedVert(:,1:3));
+                            end
+                            drawnow()
+                        end
+                    end
+
                     % Animation of Robot
                     robot.model.animate(qMatrix(i,:));
 
@@ -224,7 +302,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             end
 
             % Execute the motion
-                for i = 1:steps
+%                 for i = 1:steps
+                while i < steps
                     % Animation of Robot
 
                     %check for active estop
@@ -259,16 +338,122 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Gripper base transform for Panda.
                     pos3 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
                     pos4 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+                    
+                    groundCheck1 = collisionCheck.collisionGroundLPI(robot); % variable to store if end effector will hit ground
+                    groundCheck2 = collisionCheck.collisionGroundLPI(robot2); % variable to store if end effector will hit ground
+                    
+                    selfCheck1 = collisionCheck.collisionCheckSelf(robot, qMatrix(i,:)); % variable to store if robot will hit self
+                    selfCheck2 = collisionCheck.collisionCheckSelf(robot2, qMatrix2(i,:)); % variable to store if robot will hit self
 
-                    if collisionCheck.collisionCheckGrip(robot2, point) % if robot2 tries to move into robot1
-                        disp('Collision Detected!');
-%                         break %break loop and stop motion
+                    if  robotsGripsCheck
+                        % if robot2 tries to move into robot1
+                        disp('Collision between robots Detected!');
+                        % break %break loop and stop motion
+                        if i <= 1 
+                            poseA = robot.model.getpos();
+                        else
+                            poseA = qMatrix(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        end
+                        pointA = robot.model.fkineUTS(poseA);
+                        pointAadj = pointA(1:3, 4);
+                        poseAnext = robot.model.fkineUTS(qMatrix(i,:));
+                        avoidPointA = pointA*inv(poseAnext)*transl(pointAadj(1), pointAadj(2), pointAadj(3));
+                        avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
+
+                        if i <= 1
+                            poseB = robot2.model.getpos();
+                        else
+                            poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        end
+                        pointB = robot2.model.fkineUTS(poseB);
+                        pointBadj = pointB(1:3, 4);
+                        poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
+                        avoidPointB = pointB*inv(poseBnext)*transl(pointBadj(1), pointBadj(2), pointBadj(3));
+                        avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
+
+                        s1 = lspb(0,1,sideSteps);
+
+                        firstqMatrix = (1-s1)*poseA + s1*avoidPoseA;
+                        firstqMatrix2 = (1-s1)*poseB + s1*avoidPoseB;
+
+                        % abs(steps -(i - sideSteps)) % if the collision occurs near the end, the actual new trajectory to endpoint wont need the full amount from 'steps'
+                        s2 = lspb(0,1, steps - sideSteps); 
+                        secondqMatrix = (1-s2)*avoidPoseA + s2*q2;
+                        secondqMatrix2 = (1-s2)*avoidPoseB + s2*q2_2;
+
+                        qMatrix = [firstqMatrix; secondqMatrix];
+                        qMatrix2 = [firstqMatrix2; secondqMatrix2];
+                        i = 1;
+
+                    end
+
+                    if groundCheck1 == 1 || selfCheck1
+                        disp('Collision robot 1 Detected!');
+                        % calculate new position to avoid collision
+                        if i <= 1
+                            poseA = robot.model.getpos();
+                        else
+                            poseA = qMatrix(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        end
+                        pointA = robot.model.fkineUTS(poseA);
+                        pointAadj = pointA(1:3, 4);
+                        poseAnext = robot.model.fkineUTS(qMatrix(i,:));
+                        avoidPointA = pointA*inv(poseAnext)*transl(pointAadj(1), pointAadj(2), pointAadj(3));
+                        avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
+
+                        if i <= 1
+                            poseB = robot2.model.getpos();
+                        else
+                            poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        end
+
+                        % remake new trajectory 
+                        s1 = lspb(0,1,sideSteps);
+                        firstqMatrix = (1-s1)*poseA + s1*avoidPoseA;
+                        s2 = lspb(0,1, steps - sideSteps); 
+                        secondqMatrix = (1-s2)*firstqMatrix(sideSteps, :) + s2*q2;
+                        % robot2 likely unaffected, remake current trajectory
+                        s3 = lspb(s(i),1, steps);
+                        qMatrix2 = (1-s3)*poseB + s3*q2_2;
+
+                        qMatrix = [firstqMatrix; secondqMatrix];
                         
-                        % Avoiding collision
-                        % move away from colliding robot/object A*inv(B)*A
-                        % => MoveRobot(robot2, [robot2*inv(point)*robot2] moves directly away
-                        % remake rest of qmatrix
-                        
+                        i = 1; % reset interator
+
+                    end
+
+                    if groundCheck2 == 1 || selfCheck2
+                        disp('Collision robot 2 Detected!');
+                        % calculate new position to avoid collision
+                        if i <= 1
+                            poseB = robot2.model.getpos();
+                        else
+                            poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        end
+                        pointB = robot2.model.fkineUTS(poseB);
+                        pointBadj = pointB(1:3, 4);
+                        poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
+                        avoidPointB = pointB*inv(poseBnext)*transl(pointBadj(1), pointBadj(2), pointBadj(3));
+                        avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
+                        poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        if i <= 1 
+                            poseA = robot.model.getpos();
+                        else
+                            poseA = qMatrix(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
+                        end
+                        % remake new trajectory 
+                        s1 = lspb(0,1,sideSteps);
+                        firstqMatrix = (1-s1)*poseB + s1*avoidPoseB;
+                        s2 = lspb(0,1, steps - sideSteps); 
+                        secondqMatrix = (1-s2)*firstqMatrix(sideSteps, :) + s2*q2_2;
+                        qMatrix2 = [firstqMatrix; secondqMatrix];
+
+                        % robot1 likely unaffected, remake current trajectory
+                        s3 = lspb(s(i),1, steps);
+                        qMatrix = (1-s3)*poseA + s3*q2_2;
+
+                                                
+                        i = 1; % reset interator
 
                     end
                     g_1.model.base = pos1; 
