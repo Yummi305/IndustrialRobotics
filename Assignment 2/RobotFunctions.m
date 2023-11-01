@@ -112,8 +112,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             % move end effector to specified location and carry bricks if required
             
             
-            %% Check eStop and buttons
-            %[eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+            %% Set eStop bool to false
+            StoreSwitchButtons.setgeteStop(false)
 
             % if eStopValue == true
             % 
@@ -322,7 +322,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
         
         ReturnPosition = QpositionMat;
 
-        if stoprequest == true
+        if StoreSwitchButtons.setgeteStop == true
 
              StopSteps = 10;
 
@@ -333,7 +333,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
         qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
         qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
 
-        while stoprequest == true
+        while StoreSwitchButtons.setgeteStop == true
     
              for i = 1:StopSteps
 
@@ -352,7 +352,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
              [eStopValue, ManualCheckValue] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
-                stoprequest = eStopValue;
+                %stoprequest = eStopValue;
                 
                 %% need to make edits here
                 if ManualCheckValue == true
@@ -385,19 +385,21 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
 function [eStopValue, ManualCheckValue] = Check_eStop(check_estopvalue,check_manual)
 
-            
+
                 eStopValue = check_estopvalue;
                 ManualCheckValue = check_manual; 
 
-                if (eStopValue == true)
-                    ValueCheck = eStopValue
+                if (StoreSwitchButtons.setgeteStop == true)
+                    
+                ValueCheck = eStopValue
                 disp('STOP change in RobotFunction')
 
-                pause(20)
+                pause(5)
 
-                elseif (eStopValue == false)
-
-                    disp('expected off')
+                elseif (StoreSwitchButtons.setgeteStop == false)
+                
+                    ValueCheck = eStopValue
+                    disp('...');
 
                 end
 
