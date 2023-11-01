@@ -18,12 +18,13 @@ classdef RobotFunctions
         function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
-            
-            %% eStop Attempt not working yet
 
-            % eStop goes here
+            %% Set eStop bool to false
+            StoreSwitchButtons.setgeteStop(false)
+            StoreSwitchButtons.setgetManual(false)
 
-                    %%
+            robotcount = 1;
+              
 
             if (endEffDirection == 1)
                 endMove = transl(position) * trotx(-pi/2); % To position end effector point in towards y axis in positive direction
@@ -77,6 +78,28 @@ classdef RobotFunctions
 
             % Execute the motion
                 for i = 1:steps
+                    
+                    %Check estop at each step
+                    [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+
+                    if eStopValue == true
+                    
+                    Harvest_pos = robot.model.getpos();
+                    Grip1_pos = g_1.model.getpos();
+                    Grip2_pos = g_2.model.getpos();
+                    Panda_pos = robot2.model.getpos();
+                    Grip3_pos = g_3.model.getpos();
+                    Grip4_pos = g_4.model.getpos();
+                        
+
+                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
+
+                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,StopQs);
+
+                    disp ('Stop success, Return to loop')
+                    else
+
+                    end
 
                     % To check for collisions against self and ground
                     groundCheck = collF.collisionGroundLPI(robot);
@@ -192,6 +215,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             %% Set eStop bool to false
             StoreSwitchButtons.setgeteStop(false)
+            StoreSwitchButtons.setgetManual(false)
 
             
             % Obtain robots current position and desired position to form qMatrix
