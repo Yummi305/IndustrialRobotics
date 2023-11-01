@@ -108,6 +108,13 @@ classdef RobotFunctions
                             g_2.model.base = pos2;
                             g_1.model.animate(g_1.model.getpos());
                             g_2.model.animate(g_2.model.getpos());
+
+                            if holdingObject
+                                transMatrix = robot.model.fkine(newqMatrix(a,:)).T; % create transformation matrix of current end effector position
+                                transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                                transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                                set(payload,'Vertices',transfromedVert(:,1:3));
+                            end
                             drawnow()
                         end
 
@@ -135,6 +142,13 @@ classdef RobotFunctions
                             g_2.model.base = pos2;
                             g_1.model.animate(g_1.model.getpos());
                             g_2.model.animate(g_2.model.getpos());
+
+                            if holdingObject
+                                transMatrix = robot.model.fkine(qMatrix(b,:)).T; % create transformation matrix of current end effector position
+                                transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                                transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                                set(payload,'Vertices',transfromedVert(:,1:3));
+                            end
                             drawnow()
                         end
                     end
