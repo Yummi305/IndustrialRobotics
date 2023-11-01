@@ -4,20 +4,20 @@ clf;
 clear;
 % close all;
 
-%% Testing mode toggle
+% Testing mode toggle
 harvest_toggle = true;
 QA_toggle = true;
 
-%% Create instance of Robot Functions Class in order to access functions
+% Create instance of Robot Functions Class in order to access functions
 robotFunctions = RobotFunctions();
 
-%% Create instance of Brick Functions Class in order to access functions
+% Create instance of Brick Functions Class in order to access functions
 objFunc = ObjectFunctions();
 
-%% Create collision functions class to access functions
+% Create collision functions class to access functions
 colFunc = CollisionFunctions();
-%% Setup environment
-axis([-2.2, 1, -2, 1.2, 0.01, 1.5]); % original
+% Setup environment
+axis([-2.2, 1, -2, 1.2, 0.01, 1.3]); % original z = 1.5
 % axis([-1.6, 0.8, -0.45, 1.05, 0.01, 1]); % for orange picking clips
 % axis equal;
 hold on
@@ -162,23 +162,24 @@ end
 
 %% Generate LinearUR3
 % Initialise LinearUR3
-% harvestBot = LinearUR3(transl(0,0,0.02));
-% harvestBot.model.getpos()
+harvestBot = LinearUR3(transl(0,0,0.02));
+hold on
+harvestBot.model.getpos();
 
-%% Initialise Gripper on UR3 End Effector
+% Initialise Gripper on UR3 End Effector
 % Initialise Gripper robots on UR3 end effector.
-% pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
-% pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
-% g1 = GripRight(pos1); % initiate right gripper
-% g2 = GripLeft(pos2); % initial left gripper
+pos1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.0127,0.0612)*trotx(pi/2); % Base position right gripper offset from UR3's end effector (0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0.0612)*trotx(pi/2); % Base position left gripper offset from UR3's end effector (-0.0127 is the ditance of the grip from the base cebtre and 0.0612 is the depth of the base)
+g1 = GripRight(pos1); % initiate right gripper
+g2 = GripLeft(pos2); % initial left gripper
 
-% robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
+robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
-%% Generate Franka Emika (Panda)
+% Generate Franka Emika (Panda)
 QA = Panda(transl(-0.6,-0.8,0.02));
 
 
-%% Franka Emika Gripper
+% Franka Emika Gripper
 % Initialise Gripper robots on Panda end effector.
 
 %Using Robotiq 2f-145
@@ -187,15 +188,15 @@ pos4 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,0.0127,0.05)*trotx(-pi/2
 g3 = GripRight(pos3); % initiate right gripper
 g4 = GripLeft(pos4); % initial left gripper 
 
-clc;
-robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
+robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
+clc
 %% home robots
 % robotFunctions.MoveRobot(QA,[-0.33,-0.8,1.145],40,0,false,0,0,g3,g4,2); %QA home pos
 % 
 % robotFunctions.MoveRobot(harvestBot, [-0.1942, 0, 0.7142],50,0,false,0,0,g1,g2,2);  %harvest home pos
 % robotFunctions.MoveRobot(harvestBot, [-0.68, -.322, 0.36],50,0,false,0,2,g1,g2,2);  %harvest recording start pos
-%% 
+
 
 % robotFunctions.MoveRobot(harvestBot,[-0.5, -.2, 0.45],50,0,false,0,3,g1,g2,2); %harvest coll pos
 % robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,
@@ -214,7 +215,97 @@ clc
 % robotFunctions.MoveRobot(QA,[-1.11,-1.4,.55],40,0,false,0,2,g3,g4,2);
 testmove(QA, [.807, -.47, .35], 100,0,false,0,1,g3,g4,2);
 
+%% LPI test
 
+% Given a plane (normal and point) and two points that make up another line, get the intersection
+% Check == 0 if there is no intersection
+% Check == 1 if there is a line plane intersection between the two points
+% Check == 2 if the segment lies in the plane (always intersecting)
+% Check == 3 if there is intersection point which lies outside line segment
+% (planeNormal,pointOnPlane,point1OnLine,point2OnLine)
+clf
+clc
+hold on
+QA.PlotAndColourRobot()
+g3 = GripRight(pos3); % initiate right gripper
+g4 = GripLeft(pos4); % initial left gripper 
+% robotFunctions.GripperMove(g3,g4,1);
+harvestBot.PlotAndColourRobot()
+g1 = GripRight(pos1); % initiate right gripper
+g2 = GripLeft(pos2); % initial left gripper
+% robotFunctions.GripperMove(g1,g2,1);
+% [X,Y] = meshgrid(-0.75:0.05:0.75,-0.75:0.05:0.75);
+% sizeMat = size(X);
+% Z = repmat(0,sizeMat(1),sizeMat(2));
+% oneSideOfCube_h = surf(X,Y,Z);
+% plane = [X(:),Y(:),Z(:)];
+
+harvestGrip1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.127,0.2312);
+harvestGrip2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.127,0.2312);
+pointC = harvestGrip1(1:3,4);
+pointD = harvestGrip2(1:3,4);
+
+QAgrip1 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,-0.127,0.215);
+QAgrip2 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,0.127,0.215);
+pointA = QAgrip1(1:3,4);
+pointB = QAgrip2(1:3,4);
+
+X1 = pointA(1);
+Y1 = pointA(2);
+Z1 = pointA(3);
+X2 = pointB(1);
+Y2 = pointB(2);
+Z2 = pointB(3);
+
+X3 = pointC(1);
+Y3 = pointC(2);
+Z3 = pointC(3);
+X4 = pointD(1);
+Y4 = pointD(2);
+Z4 = pointD(3);
+
+plot3(linspace(X3,X4, 20), linspace(Y3,Y4, 20), linspace(Z3,Z4,20))
+
+plot3(linspace(X1,X2, 20), linspace(Y1,Y2, 20), linspace(Z1,Z2,20))
+planenormal = [0, 0, 1];
+planepoint = [0,0,0];
+check = LPIcheck(planenormal, planepoint, [X1,Y1,Z1], [X2,Y2,Z2])
+% for i = 1:length(plane)
+%     [intPoint, check] = LinePlaneIntersection([0,0,0], [0,0,0], [X1,Y1,Z1], [X2,Y2,Z2]);
+%     intPoints{i} = intPoint(:)';
+%     checks(i) = check;
+% end
+%%
+% robotFunctions.MoveRobot(harvestBot, [])
+
+harvestGrip1 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,0.127,0.2312);
+harvestGrip2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.127,0.2312);
+pointC = harvestGrip1(1:3,4);
+pointD = harvestGrip2(1:3,4);
+
+QAgrip1 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,-0.127,0.215);
+QAgrip2 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,0.127,0.215);
+pointA = QAgrip1(1:3,4);
+pointB = QAgrip2(1:3,4);
+
+LPIcheck([0,0,1], [0,0,0], [pointA(1), pointA(2), pointA(3)], [pointB(1), pointB(2), pointB(3)])
+LPIcheck([0,0,1], [0,0,0], [pointC(1), pointC(2), pointC(3)], [pointD(1), pointD(2), pointD(3)])
+
+%% Test ground collision detection
+
+robotFunctions.MoveRobot(QA, [-.47, -.7, .75], 100,0,false,0,1,g3,g4,0);
+
+testmove(QA, [.347, -.27, .1], 100,0,false,0,2,g3,g4,2);
+
+%% test both robots movement will full collision
+clc
+robotFunctions.MoveTwoRobots(harvestBot,[0.18, -.2, 0.393],50,0,false,0,2,g1,g2,0, ...
+                            QA,[-0.679, 0.4,.4],0,false,0,0,g3,g4,0, false);
+robotFunctions.MoveTwoRobots(harvestBot,[-0.28, .62, 0.443],70,0,false,0,1,g1,g2,0, ...
+                             QA,[-1.179,-0.86,.18],0,false,0,0,g3,g4,0, false);
+
+
+%% test function
 % test movement function with collision checking
 function testmove(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
 if (endEffDirection == 1)
@@ -230,16 +321,20 @@ q0 = robot.model.getpos();
 pose = robot.model.fkine(q0);
 q1 = robot.model.ikcon(pose, q0);
 q2 = robot.model.ikcon(endMove, q0);
-collF = CollisionFunctions();
+
 s = lspb(0,1,steps);  % First, create the scalar function
 qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
 for i = 1:steps
     qMatrix(i,:) = (1-s(i))*q1 + s(i)*q2;
 end
 
+% Collision detection functions
+collF = CollisionFunctions();
+
 for i = 1:steps
     % Animation of Robot
-    if collF.collisionCheckSelf(robot, qMatrix(i, :))
+    groundCheck = collF.collisionGroundLPI(robot); % variable to store if end effector will hit ground
+    if collF.collisionCheckSelf(robot, qMatrix(i, :)) || groundCheck == 1  
         disp('(potential) Collision! Avoiding...')
         poseNow = robot.model.getpos();
         pointNow = robot.model.fkine(poseNow).T;
@@ -252,7 +347,7 @@ for i = 1:steps
         %         robot.model.animate(poseAvoid); % move the robot away from collision
         
         
-        sideStep = 100;
+        sideStep = 30;
         pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj);
         q1 = robot.model.ikcon(pointNow,poseNow);
         q2 = robot.model.ikcon(pointAvoid, poseNow);
@@ -274,9 +369,16 @@ for i = 1:steps
             g_2.model.animate(g_2.model.getpos());
             drawnow()
         end
+        
+        % regenerate new trajectory to endpoint
         q0 = robot.model.getpos();
         pose = robot.model.fkine(q0);
         q1 = robot.model.ikcon(pose, q0);
+        
+        % To adjust final position upward if input is too low (z is negative)
+%       if groundCheck == 1
+%             endMove = transl(0,0,.1)*endMove; % adjust endMove upwards if in ground
+%         end
         q2 = robot.model.ikcon(endMove, q0);
         
         s = lspb(0,1,steps);  % First, create the scalar function
@@ -285,9 +387,9 @@ for i = 1:steps
 %         for a = 1:steps
 %             qMatrix(a,:) = (1-s(a))*q1 + s(a)*q2;
 %         end
-        disp('end avoidance')
+        disp('Collision avoided')
         
-        for b = 1:i
+        for b = 1:i-1
             robot.model.animate(qMatrix(b,:));
             
 %             robot.model.getpos();
@@ -301,7 +403,7 @@ for i = 1:steps
             g_2.model.animate(g_2.model.getpos());
             drawnow()
         end
-        disp('original loop matchup')
+        disp('Returning to main trajectory')
         
         
     end
@@ -333,6 +435,40 @@ for i = 1:steps
         set(payload,'Vertices',transfromedVert(:,1:3));
     end
     drawnow();
+end
+end
+%% LinePlaneIntersection
+% Given a plane (normal and point) and two points that make up another line, get the intersection
+% Check == 0 if there is no intersection
+% Check == 1 if there is a line plane intersection between the two points
+% Check == 2 if the segment lies in the plane (always intersecting)
+% Check == 3 if there is intersection point which lies outside line segment
+function check = LPIcheck(planeNormal,pointOnPlane,point1OnLine,point2OnLine)
+
+intersectionPoint = [0 0 0];
+u = point2OnLine - point1OnLine;
+w = point1OnLine - pointOnPlane;
+D = dot(planeNormal,u);
+N = -dot(planeNormal,w);
+check = 0; %#ok<NASGU>
+if abs(D) < 10^-7        % The segment is parallel to plane
+    if N == 0           % The segment lies in plane
+        check = 2;
+        return
+    else
+        check = 0;       %no intersection
+        return
+    end
+end
+
+%compute the intersection parameter
+sI = N / D;
+intersectionPoint = point1OnLine + sI.*u;
+
+if (sI < 0 || sI > 1)
+    check= 3;          %The intersection point  lies outside the segment, so there is no intersection
+else
+    check=1;
 end
 end
 
