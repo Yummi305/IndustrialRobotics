@@ -303,6 +303,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
             % Execute the motion
 %                 for i = 1:steps
+                i = 1;
                 while i < steps
                     % Animation of Robot
 
