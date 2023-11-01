@@ -112,26 +112,26 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             % move end effector to specified location and carry bricks if required
             
             
-            %% Check eStop and buttons
-            % [eStopValue, ~] = RobotFunctions.Check_eStop(obj.app.estop,obj.app.manual);
-            % 
-            % if eStopValue == true
-            % 
-            %         Harvest_pos = robot.model.getpos();
-            %         Grip1_pos = g_1.model.getpos();
-            %         Grip2_pos = g_2.model.getpos();
-            %         Panda_pos = robot2.model.getpos();
-            %         Grip3_pos = g_3.model.getpos();
-            %         Grip4_pos = g_4.model.getpos();
-            % 
-            %         StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
-            % 
-            %         RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,StopQs)
-            % 
-            %         disp ('Stop success, Return to loop')
-            % else
-            % 
-            % end
+            % Check eStop and buttons
+            [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+
+            if eStopValue == true
+
+                    Harvest_pos = robot.model.getpos();
+                    Grip1_pos = g_1.model.getpos();
+                    Grip2_pos = g_2.model.getpos();
+                    Panda_pos = robot2.model.getpos();
+                    Grip3_pos = g_3.model.getpos();
+                    Grip4_pos = g_4.model.getpos();
+
+                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
+
+                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,StopQs)
+
+                    disp ('Stop success, Return to loop')
+            else
+
+            end
 
             
             
