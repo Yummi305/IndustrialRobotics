@@ -303,6 +303,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
             % Execute the motion
 %                 for i = 1:steps
+                sideSteps = steps - 20;
                 i = 1;
                 while i < steps
                     % Animation of Robot
@@ -334,8 +335,9 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Gripper base transform for UR3.
                     pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.0612)*troty(-pi/2);%z0.0612
                     pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.0612)*troty(-pi/2);%z0.0612
-                    point = (pos1(1:3, 4)+pos2(1:3, 4))/2;
                     
+                    point = (pos1(1:3, 4)+pos2(1:3, 4))/2;
+                    robotsGripsCheck = collisionCheck.collisionCheckGrip(robot2, point);
                     % Gripper base transform for Panda.
                     pos3 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
                     pos4 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
@@ -407,7 +409,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         else
                             poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         end
-
+                        pointB = robot2.model.fkine(poseB);
+                        poseB = robot2.model.ikcon(pointB, poseB);
                         % remake new trajectory 
                         s1 = lspb(0,1,sideSteps);
                         firstqMatrix = (1-s1)*poseA + s1*avoidPoseA;
@@ -442,6 +445,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         else
                             poseA = qMatrix(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         end
+                        pointA = robot.model.fkine(poseA);
+                        poseA = robot.model.ikcon(pointA, poseA);
                         % remake new trajectory 
                         s1 = lspb(0,1,sideSteps);
                         firstqMatrix = (1-s1)*poseB + s1*avoidPoseB;
@@ -451,7 +456,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                         % robot1 likely unaffected, remake current trajectory
                         s3 = lspb(s(i),1, steps);
-                        qMatrix = (1-s3)*poseA + s3*q2_2;
+                        qMatrix = (1-s3)*poseA + s3*q2;
 
                                                 
                         i = 1; % reset interator
