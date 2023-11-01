@@ -391,6 +391,8 @@ function [eStopValue, ManualCheckValue] = Check_eStop(check_estopvalue,check_man
                     ValueCheck = eStopValue
                 disp('STOP change in RobotFunction')
 
+                pause(20)
+
                 elseif (eStopValue == false)
 
                     disp('expected off')
