@@ -529,7 +529,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 %stoprequest = eStopValue;
                 
                 %% need to make edits here
-                if ManualCheckValue == true
+                if (ManualCheckValue == true && eStopValue == false)
 
                     disp('Exit to Manual Overide')
 
@@ -546,9 +546,10 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 
         end
 
-        elseif stoprequest == false
+        elseif StoreSwitchButtons.setgeteStop == false
 
             disp('safe to continue') %temp debugging for estop
+
         end
     
   
@@ -565,15 +566,13 @@ function [eStopValue, ManualCheckValue] = Check_eStop(check_estopvalue,check_man
 
                 if (StoreSwitchButtons.setgeteStop == true)
                     
-                ValueCheck = eStopValue
-                disp('STOP change in RobotFunction')
+                ValueCheck = eStopValue;
+                disp('STOP recognised')
 
-                pause(5)
+                pause(2)
 
                 elseif (StoreSwitchButtons.setgeteStop == false)
-                
-                    ValueCheck = eStopValue
-                    disp('...');
+                    
 
                 end
 
