@@ -112,26 +112,26 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             % move end effector to specified location and carry bricks if required
             
             
-            % Check eStop and buttons
-            [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+            %% Check eStop and buttons
+            %[eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
-            if eStopValue == true
+            % if eStopValue == true
+            % 
+            %         Harvest_pos = robot.model.getpos();
+            %         Grip1_pos = g_1.model.getpos();
+            %         Grip2_pos = g_2.model.getpos();
+            %         Panda_pos = robot2.model.getpos();
+            %         Grip3_pos = g_3.model.getpos();
+            %         Grip4_pos = g_4.model.getpos();
+            % 
+            %         StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
+            % 
+            %         RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,StopQs)
+            % 
+            %         disp ('Stop success, Return to loop')
+            % else
 
-                    Harvest_pos = robot.model.getpos();
-                    Grip1_pos = g_1.model.getpos();
-                    Grip2_pos = g_2.model.getpos();
-                    Panda_pos = robot2.model.getpos();
-                    Grip3_pos = g_3.model.getpos();
-                    Grip4_pos = g_4.model.getpos();
-
-                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
-
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,StopQs)
-
-                    disp ('Stop success, Return to loop')
-            else
-
-            end
+            %end
 
             
             % Obtain robots current position and desired position to form qMatrix
@@ -175,6 +175,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 %             qMatrix = jtraj(q1,q2,steps);
 
             % Method 2 Trapezoidal Velocity Profile - linear interpolation between points
+
             s = lspb(0,1,steps);  % First, create the scalar function
             qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
             for i = 1:steps
@@ -226,6 +227,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 for i = 1:steps
                     % Animation of Robot
 
+                    %check for active estop
                    [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
                     if eStopValue == true
@@ -237,9 +239,9 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     Grip3_pos = g_3.model.getpos();
                     Grip4_pos = g_4.model.getpos();
 
-                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos];
+                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,eStopValue,StopQs);
+                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,StopQs);
 
                     disp ('Stop success, Return to loop')
                     else
@@ -316,35 +318,35 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-      function [ReturnPosition] = eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,stoprequest,QpositionMat) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+      function [ReturnPosition] = eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,QpositionMat) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
         
         ReturnPosition = QpositionMat;
 
         if stoprequest == true
 
-             StopSteps = 1;
+             StopSteps = 10;
 
-        % qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
-        % qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
-        % qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
-        % qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
-        % qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
-        % qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
+        qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
+        qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
+        qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
+        qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
+        qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
+        qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
 
         while stoprequest == true
     
-             % for i = 1:StopSteps
-             % 
-             %    % robot1.model.animate(qPathStop_R1(i,:));
-             %    % g_1.model.animate(qPathStop_G1(i,:));
-             %    % g_2.model.animate(qPathStop_G2(i,:)); 
-             %    % robot2.model.animate(qPathStop_R2(i,:));
-             %    % g_3.model.animate(qPathStop_G3(i,:));
-             %    % g_4.model.animate(qPathStop_G4(i,:));
-             % 
+             for i = 1:StopSteps
+
+                robot1.model.animate(qPathStop_R1(i,:));
+                g_1.model.animate(qPathStop_G1(i,:));
+                g_2.model.animate(qPathStop_G2(i,:)); 
+                robot2.model.animate(qPathStop_R2(i,:));
+                g_3.model.animate(qPathStop_G3(i,:));
+                g_4.model.animate(qPathStop_G4(i,:));
+
                 drawnow();
-             % 
-             % end
+
+             end
 
              disp('stop loop run check') %debugging number of run times
 
