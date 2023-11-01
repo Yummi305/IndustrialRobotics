@@ -499,6 +499,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     end
 
                     drawnow();
+                    i = i + 1;
                 end
             
             end
