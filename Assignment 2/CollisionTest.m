@@ -9,7 +9,7 @@ harvest_toggle = true;
 QA_toggle = true;
 
 % Create instance of Robot Functions Class in order to access functions
-robotFunctions = RobotFunctions();
+% robotFunctions = RobotFunctions();
 
 % Create instance of Brick Functions Class in order to access functions
 objFunc = ObjectFunctions();
@@ -173,7 +173,7 @@ pos2 = (harvestBot.model.fkineUTS(harvestBot.model.getpos()))*transl(0,-0.0127,0
 g1 = GripRight(pos1); % initiate right gripper
 g2 = GripLeft(pos2); % initial left gripper
 
-robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
+% robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
 % Generate Franka Emika (Panda)
 QA = Panda(transl(-0.6,-0.8,0.02));
@@ -189,7 +189,7 @@ g3 = GripRight(pos3); % initiate right gripper
 g4 = GripLeft(pos4); % initial left gripper 
 
 
-robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
+% robotFunctions.GripperMove(g3,g4,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 clc
 %% home robots
 % robotFunctions.MoveRobot(QA,[-0.33,-0.8,1.145],40,0,false,0,0,g3,g4,2); %QA home pos

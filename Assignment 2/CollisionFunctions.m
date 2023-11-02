@@ -98,16 +98,20 @@ classdef CollisionFunctions
             [Tr, jointTr] = robot.model.fkine(tempAng);
             
             jointLinks = robot.model.links;
-            if strcmp(robot.plyFileNameStem,'ColouredPanda')
-                self.jointX = .088;
-                self.jointY = .088;
-%                 jointTr = jointTr([1:3, 5, 7, 9, 11]);
-                self.linkLeng = [.25 0.001 .160 0.071 .075 0.091 .095 0.091 0.051 .081 0.001];
-            end
             for i = 2:length(jointTr)
                 centre = .5*(jointTr(i - 1).t + jointTr(i).t);
                 self.centreJoints{i - 1} = centre;
                 
+            end
+            if strcmp(robot.plyFileNameStem,'ColouredPanda')
+                self.jointX = .058;
+                self.jointY = .058;
+%                 jointTr = jointTr([1:3, 5, 7, 9, 11]);
+                self.linkLeng = [.15 0.001 .110 0.071 .095 0.131 .095 0.091 0.051 .041 0.001];
+                rote = jointTr(7).tr2rpy;
+                jointAdj = transl(self.centreJoints{7});
+                jointAdj = jointAdj*trotz(rote(3))*troty(rote(2))*trotx(rote(1))*transl(0,0.1,0);
+                self.centreJoints{7} = jointAdj(1:3, 4);
             end
             if strcmp(robot.plyFileNameStem,'LinearUR3')
                 self.jointX = .058;
@@ -127,7 +131,7 @@ classdef CollisionFunctions
 %                 rotate(self.JointEllipse(j), [0 0 1], Jrot(3), self.centreJoints{j});
 %                 rotate(self.JointEllipse(j), [0 1 0], Jrot(2), self.centreJoints{j});
 %                 rotate(self.JointEllipse(j), [1 0 0], Jrot(1), self.centreJoints{j});
-%                 
+                
                 
             end
 %              pause();

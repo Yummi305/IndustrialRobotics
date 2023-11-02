@@ -309,7 +309,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
             % Execute the motion
 %                 for i = 1:steps
-                sideSteps = steps - 20;
+                sideSteps = steps - 15;
+                
                 i = 1;
                 while i < steps
                     % Animation of Robot
@@ -347,6 +348,48 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Gripper base transform for Panda.
                     pos3 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
                     pos4 = robot2.model.fkineUTS(robot2.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+                    
+                    g_1.model.base = pos1; 
+                    g_2.model.base = pos2; 
+                    g_1.model.animate(g_1.model.getpos());
+                    g_2.model.animate(g_2.model.getpos());
+
+                    g_3.model.base = pos3; 
+                    g_4.model.base = pos4; 
+                    g_3.model.animate(g_3.model.getpos());
+                    g_4.model.animate(g_4.model.getpos());
+                    
+                        
+
+                    %% gripper
+
+                    if grip == 1 || grip == 2
+                        % Gripper open or close if necessary
+                        g_1.model.animate(qPath1(i,:));
+                        g_2.model.animate(qPath2(i,:));  
+    
+                    end
+
+                    if grip2 == 1 || grip2 == 2 
+                        % Gripper open or close if necessary  
+                        g_3.model.animate(qPath3(i,:));
+                        g_4.model.animate(qPath4(i,:)); 
+                    end
+                    
+                    % Apply transformation to objects vertices to visualise movement
+                    if holdingObject
+                        transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
+                        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                        transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                        set(payload,'Vertices',transfromedVert(:,1:3));
+                    end
+
+                    if holdingObject2
+                        transMatrix = robot2.model.fkine(qMatrix2(i,:)).T; % create transformation matrix of current end effector position
+                        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
+                        transfromedVert = [vertices2,ones(size(vertices2,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
+                        set(payload2,'Vertices',transfromedVert(:,1:3));
+                    end
                     
                     groundCheck1 = collisionCheck.collisionGroundLPI(robot); % variable to store if end effector will hit ground
                     groundCheck2 = collisionCheck.collisionGroundLPI(robot2); % variable to store if end effector will hit ground
@@ -431,19 +474,42 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         i = 1; % reset interator
 
                     end
-
-                    if groundCheck2 == 1
+                    
+                    if groundCheck2 == 1 || selfCheck2
                         disp('Collision robot 2 Detected!');
                         % calculate new position to avoid collision
+                        if i < 8
+                            disp('giving time to move')
+                            drawnow();
+                            i = i+1;
+                            continue
+                        end
+                        
                         if i <= 1
                             poseB = robot2.model.getpos();
                         else
                             poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         end
                         pointB = robot2.model.fkineUTS(poseB);
-                        pointBadj = pointB(1:3, 4);
+                        pointBvec = pointB(1:3, 4);
                         poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
-                        avoidPointB = pointB*inv(poseBnext)*pointB * transl(-.01,-.01, 0)*trotz(pi/10);
+                        nextpointBvec = poseBnext(1:3, 4);
+                        targetVec = [nextpointBvec(1)-pointBvec(1), nextpointBvec(2)-pointBvec(2), nextpointBvec(3)-pointBvec(3)];
+                        magn = norm(targetVec);
+                        normalisedTarg = targetVec/magn;
+                        targetDist = -.35;
+                        newPoint = [pointBvec(1)*targetDist*normalisedTarg(1), pointBvec(2)*targetDist*normalisedTarg(2), pointBvec(3)*targetDist*normalisedTarg(3)];
+                        if groundCheck2 == 1
+                            newPoint =[pointBvec(1)*targetDist*normalisedTarg(1), pointBvec(2)*targetDist*normalisedTarg(2), pointBvec(3)*targetDist*normalisedTarg(3)+0.4];
+                        end
+%                         avoidPointB = pointB*inv(poseBnext)*(pointB) * transl(-.01,-.01, 0)*trotz(-pi/10);
+                        if isrow(newPoint)
+                            newPoint = newPoint';
+                        end
+                        newPoint = [newPoint; 1];
+                        pointB = pointB*troty(pi/4);
+                        avoidPointB = [pointB(:, 1:3), newPoint];
+
                         avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
                         poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         if i <= 1 
@@ -459,7 +525,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         s2 = lspb(0,1, steps - sideSteps); 
                         secondqMatrix = (1-s2)*firstqMatrix(sideSteps, :) + s2*q2_2;
                         qMatrix2 = [firstqMatrix; secondqMatrix];
-                        qMatrix2(sideSteps-1:sideSteps+1, :)
+                        
+%                         qMatrix2(sideSteps-1:sideSteps+1, :)
 
                         % robot1 likely unaffected, remake current trajectory
                         s3 = lspb(s(i),1, steps);
@@ -469,47 +536,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         i = 1; % reset interator
 
                     end
-                    g_1.model.base = pos1; 
-                    g_2.model.base = pos2; 
-                    g_1.model.animate(g_1.model.getpos());
-                    g_2.model.animate(g_2.model.getpos());
-
-                    g_3.model.base = pos3; 
-                    g_4.model.base = pos4; 
-                    g_3.model.animate(g_3.model.getpos());
-                    g_4.model.animate(g_4.model.getpos());
                     
-                        
-
-                    %% gripper
-
-                    if grip == 1 || grip == 2
-                        % Gripper open or close if necessary
-                        g_1.model.animate(qPath1(i,:));
-                        g_2.model.animate(qPath2(i,:));  
-    
-                    end
-
-                    if grip2 == 1 || grip2 == 2 
-                        % Gripper open or close if necessary  
-                        g_3.model.animate(qPath3(i,:));
-                        g_4.model.animate(qPath4(i,:)); 
-                    end
-                    
-                    % Apply transformation to objects vertices to visualise movement
-                    if holdingObject
-                        transMatrix = robot.model.fkine(qMatrix(i,:)).T; % create transformation matrix of current end effector position
-                        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
-                        transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
-                        set(payload,'Vertices',transfromedVert(:,1:3));
-                    end
-
-                    if holdingObject2
-                        transMatrix = robot2.model.fkine(qMatrix2(i,:)).T; % create transformation matrix of current end effector position
-                        transMatrix = transMatrix*transl(0,0,0.2); % Manipulate translation matrix to offset object from end effector
-                        transfromedVert = [vertices2,ones(size(vertices2,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
-                        set(payload2,'Vertices',transfromedVert(:,1:3));
-                    end
 
                     drawnow();
                     i = i + 1;
