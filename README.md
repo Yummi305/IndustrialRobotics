@@ -15,7 +15,8 @@ Dennis Nguyen | Yummi-305 | dennis.t.nguyen-1@student.uts.edu.au
 - Recording simulation clips for 1-minute and 3-minte video  
 
 Julien Wang | JW-355 | julien.wang@student.uts.edu.au  
-- Implementation of Collision Detection and avoidance system  
+- Implementation of Collision Detection and avoidance system
+- Light Curtain implementation for detection of cow
 - Usage of real UR3 robot  
 - Recording simulation clips for 1-minute and 3-minte video  
 
