@@ -572,13 +572,14 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
              % end
 
-             disp('stop loop run check') %debugging number of run times
-
+             %disp('stop loop run check') %debugging number of run times
+                
+             %%check for change in estop value
              [eStopValue, ManualCheckValue] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
                 
-                %% need to make edits here
-                if (ManualCheckValue == true && eStopValue == false)
+                %% need to make edits here for teach control
+                if (StoreSwitchButtons.setgetManual == true && StoreSwitchButtons.setgeteStop == false)
 
                     disp('Exit to Manual Overide')
 
@@ -586,7 +587,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                 end
                 
-                if eStopValue == false
+                if StoreSwitchButtons.setgeteStop == false
                    
                     disp('Resume Harvest/QA')
                     
@@ -614,14 +615,14 @@ function [eStopValue, ManualCheckValue] = Check_eStop(check_estopvalue,check_man
                 ManualCheckValue = check_manual; 
 
                 if (StoreSwitchButtons.setgeteStop == true)
-                    
-                ValueCheck = eStopValue;
-                disp('STOP recognised')
 
-                pause(2)
+                %ValueCheck = eStopValue;
+                %disp('STOP recognised')
+
+                pause(0.02)
 
                 elseif (StoreSwitchButtons.setgeteStop == false)
-                    
+
 
                 end
 
