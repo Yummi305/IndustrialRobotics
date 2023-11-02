@@ -17,8 +17,6 @@ classdef Panda < RobotBaseClass
         function CreateModel(self)
 
 %         % Create Panda model
-
-
             link(1) = Link('d',0.333,'a',0,'alpha',-pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD 1
             link(2) = Link('d',0,'a',0,'alpha',pi/2,'offset',0,'qlim', [-2.26893, 2.07694]); %GOOD 2
             link(3) = Link('d',0.316,'a',0,'alpha',pi/2,'offset',0,'qlim', [-pi, pi]); %GOOD 3
