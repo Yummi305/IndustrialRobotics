@@ -474,7 +474,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     if groundCheck2 == 1 || selfCheck2
                         disp('Collision robot 2 Detected!');
                         % calculate new position to avoid collision
-                        if i < 8
+                        if i < 5
                             disp('giving time to move')
                             drawnow();
                             i = i+1;
@@ -493,7 +493,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         targetVec = [nextpointBvec(1)-pointBvec(1), nextpointBvec(2)-pointBvec(2), nextpointBvec(3)-pointBvec(3)];
                         magn = norm(targetVec);
                         normalisedTarg = targetVec/magn;
-                        targetDist = -.35;
+                        targetDist = -rand(1)*.9;
                         newPoint = [pointBvec(1)*targetDist*normalisedTarg(1), pointBvec(2)*targetDist*normalisedTarg(2), pointBvec(3)*targetDist*normalisedTarg(3)];
                         if groundCheck2 == 1
                             newPoint =[pointBvec(1)*targetDist*normalisedTarg(1), pointBvec(2)*targetDist*normalisedTarg(2), pointBvec(3)*targetDist*normalisedTarg(3)+0.4];
@@ -503,7 +503,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                             newPoint = newPoint';
                         end
                         newPoint = [newPoint; 1];
-                        pointB = pointB*troty(pi/4);
+                        randRot = trotz((rand()-.5)*pi/4)*troty((rand()-.5)*pi/10);
+                        pointB = pointB*randRot;
                         avoidPointB = [pointB(:, 1:3), newPoint];
 
                         avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
