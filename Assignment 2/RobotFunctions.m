@@ -7,7 +7,6 @@ classdef RobotFunctions
         app
     end
 
-
     methods (Static)  
         
         function obj = RobotFunctions(app)
@@ -20,9 +19,8 @@ classdef RobotFunctions
             % Obtain robots current position and desired position to form qMatrix
 
             %% Set eStop bool to false
-            StoreSwitchButtons.setgeteStop(false)
-            StoreSwitchButtons.setgetManual(false)
-
+            StoreSwitchButtons.setgeteStop(false);
+            StoreSwitchButtons.setgetManual(false);
             robotcount = 1;
               
 
@@ -83,18 +81,15 @@ classdef RobotFunctions
                     [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
                     if eStopValue == true
-                    
-                    Harvest_pos = robot.model.getpos();
+
+                    % if eStop is true save Q values of each robot
+                    Bot_pos = robot.model.getpos();
                     Grip1_pos = g_1.model.getpos();
                     Grip2_pos = g_2.model.getpos();
-                    Panda_pos = robot2.model.getpos();
-                    Grip3_pos = g_3.model.getpos();
-                    Grip4_pos = g_4.model.getpos();
-                        
 
-                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
+                    StopQs = [Bot_pos Grip1_pos Grip2_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,StopQs);
+                    RobotFunctions.eStop(StopQs,robotcount); %robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos
 
                     disp ('Stop success, Return to loop')
                     else
@@ -214,8 +209,10 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             
             %% Set eStop bool to false
-            StoreSwitchButtons.setgeteStop(false)
-            StoreSwitchButtons.setgetManual(false)
+            StoreSwitchButtons.setgeteStop(false);
+            StoreSwitchButtons.setgetManual(false);
+
+            robotcount = 2;
 
             
             % Obtain robots current position and desired position to form qMatrix
@@ -328,9 +325,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,StopQs);
+                    RobotFunctions.eStop(StopQs,robotcount); % removed -robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,
 
-                    disp ('Stop success, Return to loop')
                     else
 
                     end
@@ -517,41 +513,41 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-      function [ReturnPosition] = eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,QpositionMat) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+            function [ReturnPosition,RobotsQ] = eStop(QpositionMat, RobotNumber) % original gripper move function repurposed to inital movement only as other components are inside robot model move. %robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos
         
         ReturnPosition = QpositionMat;
+        RobotsQ = RobotNumber;
 
         if StoreSwitchButtons.setgeteStop == true
 
-             StopSteps = 10;
-
-        qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
-        qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
-        qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
-        qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
-        qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
-        qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
+        %      StopSteps = 10;
+        % 
+        % qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
+        % qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
+        % qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
+        % qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
+        % qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
+        % qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
 
         while StoreSwitchButtons.setgeteStop == true
     
-             for i = 1:StopSteps
-
-                robot1.model.animate(qPathStop_R1(i,:));
-                g_1.model.animate(qPathStop_G1(i,:));
-                g_2.model.animate(qPathStop_G2(i,:)); 
-                robot2.model.animate(qPathStop_R2(i,:));
-                g_3.model.animate(qPathStop_G3(i,:));
-                g_4.model.animate(qPathStop_G4(i,:));
+             % for i = 1:StopSteps
+             % 
+             %    robot1.model.animate(qPathStop_R1(i,:));
+             %    g_1.model.animate(qPathStop_G1(i,:));
+             %    g_2.model.animate(qPathStop_G2(i,:)); 
+             %    robot2.model.animate(qPathStop_R2(i,:));
+             %    g_3.model.animate(qPathStop_G3(i,:));
+             %    g_4.model.animate(qPathStop_G4(i,:));
 
                 drawnow();
 
-             end
+             % end
 
              disp('stop loop run check') %debugging number of run times
 
              [eStopValue, ManualCheckValue] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
-                %stoprequest = eStopValue;
                 
                 %% need to make edits here
                 if (ManualCheckValue == true && eStopValue == false)

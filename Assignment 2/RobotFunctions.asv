@@ -7,7 +7,6 @@ classdef RobotFunctions
         app
     end
 
-
     methods (Static)  
         
         function obj = RobotFunctions(app)
@@ -22,7 +21,6 @@ classdef RobotFunctions
             %% Set eStop bool to false
             StoreSwitchButtons.setgeteStop(false)
             StoreSwitchButtons.setgetManual(false)
-
             robotcount = 1;
               
 
@@ -83,19 +81,15 @@ classdef RobotFunctions
                     [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
                     if eStopValue == true
-                    
-                        try
-                    Harvest_pos = robot.model.getpos();
+                        
+                    % if eStop is true save Q values of each robot
+                    Bot_pos = robot.model.getpos();
                     Grip1_pos = g_1.model.getpos();
                     Grip2_pos = g_2.model.getpos();
-                    Panda_pos = robot2.model.getpos();
-                    Grip3_pos = g_3.model.getpos();
-                    Grip4_pos = g_4.model.getpos();
-                        end
 
-                    StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
+                    StopQs = [Bot_pos Grip1_pos Grip2_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,StopQs);
+                    RobotFunctions.eStop(StopQs,robotcount); %robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos
 
                     disp ('Stop success, Return to loop')
                     else
@@ -218,6 +212,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             StoreSwitchButtons.setgeteStop(false)
             StoreSwitchButtons.setgetManual(false)
 
+            robotcount = 2;
+
             
             % Obtain robots current position and desired position to form qMatrix
             collisionCheck = CollisionFunctions();
@@ -329,9 +325,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,StopQs);
+                    RobotFunctions.eStop(StopQs,robotcount); % removed -robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,
 
-                    disp ('Stop success, Return to loop')
                     else
 
                     end
@@ -367,7 +362,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointA = robot.model.fkineUTS(poseA);
                         pointAadj = pointA(1:3, 4);
                         poseAnext = robot.model.fkineUTS(qMatrix(i,:));
-                        avoidPointA = pointA*inv(poseAnext)*transl(pointAadj(1), pointAadj(2), pointAadj(3));
+                        avoidPointA = pointA*inv(poseAnext)*pointA;
                         avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
 
                         if i <= 1
@@ -378,7 +373,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointB = robot2.model.fkineUTS(poseB);
                         pointBadj = pointB(1:3, 4);
                         poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
-                        avoidPointB = pointB*inv(poseBnext)*transl(pointBadj(1), pointBadj(2), pointBadj(3));
+                        avoidPointB = pointB*inv(poseBnext)*pointB;
                         avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
 
                         s1 = lspb(0,1,sideSteps);
@@ -408,7 +403,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointA = robot.model.fkineUTS(poseA);
                         pointAadj = pointA(1:3, 4);
                         poseAnext = robot.model.fkineUTS(qMatrix(i,:));
-                        avoidPointA = pointA*inv(poseAnext)*transl(pointAadj(1), pointAadj(2), pointAadj(3));
+                        avoidPointA = pointA*inv(poseAnext)*pointA;
                         avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
 
                         if i <= 1
@@ -433,7 +428,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     end
 
-                    if groundCheck2 == 1 || selfCheck2
+                    if groundCheck2 == 1
                         disp('Collision robot 2 Detected!');
                         % calculate new position to avoid collision
                         if i <= 1
@@ -444,7 +439,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointB = robot2.model.fkineUTS(poseB);
                         pointBadj = pointB(1:3, 4);
                         poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
-                        avoidPointB = pointB*inv(poseBnext)*transl(pointBadj(1), pointBadj(2), pointBadj(3));
+                        avoidPointB = pointB*inv(poseBnext)*pointB * transl(-.01,-.01, 0)*trotz(pi/10);
                         avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
                         poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         if i <= 1 
@@ -460,6 +455,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         s2 = lspb(0,1, steps - sideSteps); 
                         secondqMatrix = (1-s2)*firstqMatrix(sideSteps, :) + s2*q2_2;
                         qMatrix2 = [firstqMatrix; secondqMatrix];
+                        qMatrix2(sideSteps-1:sideSteps+1, :)
 
                         % robot1 likely unaffected, remake current trajectory
                         s3 = lspb(s(i),1, steps);
@@ -517,41 +513,41 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             
             end
 
-      function [ReturnPosition] = eStop(robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos,QpositionMat) % original gripper move function repurposed to inital movement only as other components are inside robot model move.
+            function [ReturnPosition,RobotsQ] = eStop(QpositionMat, RobotNumber) % original gripper move function repurposed to inital movement only as other components are inside robot model move. %robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos
         
         ReturnPosition = QpositionMat;
+        RobotsQ = RobotNumber;
 
         if StoreSwitchButtons.setgeteStop == true
 
-             StopSteps = 10;
-
-        qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
-        qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
-        qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
-        qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
-        qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
-        qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
+        %      StopSteps = 10;
+        % 
+        % qPathStop_R1 = jtraj(r1_currentpos,r1_currentpos,StopSteps);
+        % qPathStop_G1 = jtraj(g1_currentpos,g1_currentpos,StopSteps);
+        % qPathStop_G2 = jtraj(g2_currentpos,g2_currentpos,StopSteps);
+        % qPathStop_R2 = jtraj(r2_currentpos,r2_currentpos,StopSteps);
+        % qPathStop_G3 = jtraj(g3_currentpos,g3_currentpos,StopSteps);
+        % qPathStop_G4 = jtraj(g4_currentpos,g4_currentpos,StopSteps);
 
         while StoreSwitchButtons.setgeteStop == true
     
-             for i = 1:StopSteps
-
-                robot1.model.animate(qPathStop_R1(i,:));
-                g_1.model.animate(qPathStop_G1(i,:));
-                g_2.model.animate(qPathStop_G2(i,:)); 
-                robot2.model.animate(qPathStop_R2(i,:));
-                g_3.model.animate(qPathStop_G3(i,:));
-                g_4.model.animate(qPathStop_G4(i,:));
+             % for i = 1:StopSteps
+             % 
+             %    robot1.model.animate(qPathStop_R1(i,:));
+             %    g_1.model.animate(qPathStop_G1(i,:));
+             %    g_2.model.animate(qPathStop_G2(i,:)); 
+             %    robot2.model.animate(qPathStop_R2(i,:));
+             %    g_3.model.animate(qPathStop_G3(i,:));
+             %    g_4.model.animate(qPathStop_G4(i,:));
 
                 drawnow();
 
-             end
+             % end
 
              disp('stop loop run check') %debugging number of run times
 
              [eStopValue, ManualCheckValue] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
 
-                %stoprequest = eStopValue;
                 
                 %% need to make edits here
                 if (ManualCheckValue == true && eStopValue == false)
