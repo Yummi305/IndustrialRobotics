@@ -1,6 +1,6 @@
 # IndustrialRobotics
 %% ** Read Me **
-% Orange picking robot project
+% Fruit picking robot project
 
 %% Collaborators
 % Dennis Nguyen Yummi-305   dennis.t.nguyen-1@student.uts.edu.au
@@ -11,7 +11,13 @@
 % You will need all of the relevant files to run this project.
 % cd ~/git
 % git clone git@github.com:Yummi305/IndustrialRobotics.git
+%
+% You will need to download Peter Coorke's Robotics Toolbox modified by UTS.
+% Access here: https://canvas.uts.edu.au/courses/27375/pages/subject-resources?module_item_id=1290469
 
 %% How to run simulation
 % Run startup_rvc.m from the UTS Modified version of Peter Coorke's Robotics Toolbox.
-% Run A2_main.m
+% Run FruitLoop.mlapp within the Apps folder.
+% This will open up and provide you with the option of running the system autonomously or manually.
+% Options are enabled on start up. Actions that you cannot take (yet) will be disabled until appropriate.
+
