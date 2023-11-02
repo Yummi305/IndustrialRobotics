@@ -503,7 +503,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                             newPoint = newPoint';
                         end
                         newPoint = [newPoint; 1];
-                        randRot = trotz((rand()-.5)*pi/4)*troty((rand()-.5)*pi/10);
+                        randRot = trotz((rand()-.5)*pi/4);
                         pointB = pointB*randRot;
                         avoidPointB = [pointB(:, 1:3), newPoint];
 
