@@ -342,7 +342,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointA = robot.model.fkineUTS(poseA);
                         pointAadj = pointA(1:3, 4);
                         poseAnext = robot.model.fkineUTS(qMatrix(i,:));
-                        avoidPointA = pointA*inv(poseAnext)*transl(pointAadj(1), pointAadj(2), pointAadj(3));
+                        avoidPointA = pointA*inv(poseAnext)*pointA;
                         avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
 
                         if i <= 1
@@ -353,7 +353,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointB = robot2.model.fkineUTS(poseB);
                         pointBadj = pointB(1:3, 4);
                         poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
-                        avoidPointB = pointB*inv(poseBnext)*transl(pointBadj(1), pointBadj(2), pointBadj(3));
+                        avoidPointB = pointB*inv(poseBnext)*pointB;
                         avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
 
                         s1 = lspb(0,1,sideSteps);
@@ -383,7 +383,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointA = robot.model.fkineUTS(poseA);
                         pointAadj = pointA(1:3, 4);
                         poseAnext = robot.model.fkineUTS(qMatrix(i,:));
-                        avoidPointA = pointA*inv(poseAnext)*transl(pointAadj(1), pointAadj(2), pointAadj(3));
+                        avoidPointA = pointA*inv(poseAnext)*pointA;
                         avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
 
                         if i <= 1
@@ -408,7 +408,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     end
 
-                    if groundCheck2 == 1 || selfCheck2
+                    if groundCheck2 == 1
                         disp('Collision robot 2 Detected!');
                         % calculate new position to avoid collision
                         if i <= 1
@@ -419,7 +419,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         pointB = robot2.model.fkineUTS(poseB);
                         pointBadj = pointB(1:3, 4);
                         poseBnext = robot2.model.fkineUTS(qMatrix2(i,:));
-                        avoidPointB = pointB*inv(poseBnext)*transl(pointBadj(1), pointBadj(2), pointBadj(3));
+                        avoidPointB = pointB*inv(poseBnext)*pointB * transl(-.01,-.01, 0)*trotz(pi/10);
                         avoidPoseB = robot2.model.ikcon(avoidPointB, poseB); % point for robot to avoid collision
                         poseB = qMatrix2(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         if i <= 1 
@@ -435,6 +435,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         s2 = lspb(0,1, steps - sideSteps); 
                         secondqMatrix = (1-s2)*firstqMatrix(sideSteps, :) + s2*q2_2;
                         qMatrix2 = [firstqMatrix; secondqMatrix];
+                        qMatrix2(sideSteps-1:sideSteps+1, :)
 
                         % robot1 likely unaffected, remake current trajectory
                         s3 = lspb(s(i),1, steps);

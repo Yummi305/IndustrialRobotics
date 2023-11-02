@@ -34,7 +34,7 @@ hold on
 %  surf([-4,2;-4,2],[2,2;2,2],[0,0;4,4],'CData',wall,'FaceColor','texturemap'); % Back wall
 %  surf([2,2;2,2],[-3,2;-3,2],[4,4;0,0],'CData',wall,'FaceColor','texturemap'); % Side wall
 
-%% Farm Environment
+% Farm Environment
 % Tree Location Container
 tree_position = [-0.4, 0.6, 0; 
                  -1.2, 0.6, 0;
