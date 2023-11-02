@@ -2,10 +2,34 @@
 ## ** Read Me **
 Fruit picking robot project
 
-## Collaborators
-Dennis Nguyen Yummi-305   dennis.t.nguyen-1@student.uts.edu.au  
-Julien Wang   JW-355    julien.wang@student.uts.edu.au  
-Thomas Parish tom-parish  thomas.parish-2@student.uts.edu.au  
+## Collaborators and Contribution
+Dennis Nguyen | Yummi-305 | dennis.t.nguyen-1@student.uts.edu.au  
+- GUI Design and implementation using App Designer including button logic
+- Environment Set up Class
+- Environment Model implementation
+- Safety Model implementation
+- Panda Robot Model and Class
+- Path planning and implementation of robot movement for one robot at a time
+- Robot simulation scenario implementation - manual vs autonomous, harvest only, qa only, harvest and qa
+- Manual controls / 'teach' functionality of robot and gripper
+- Recording simulation clips for 1-minute and 3-minte video
+
+Julien Wang | JW-355 | julien.wang@student.uts.edu.au  
+- Collision Detection System
+- Usage of real UR3 robot
+- Recording simulation clips for 1-minute and 3-minte video
+
+Thomas Parish | tom-parish | thomas.parish-2@student.uts.edu.au  
+- Gripper Model and Class
+- Implementation of robot movement for two robots at a time
+- Implementation of e-stop
+- Usage of real UR3 robot
+- Vision, voice, and video editing of 1-minute and 3-minute video
+
+## 1-minute video link
+https://www.youtube.com/watch?v=wBfQ82aiZdo
+
+## 3-minute video link
   
 ## Pre-requisites
 You will need all of the relevant files to run this project.  
