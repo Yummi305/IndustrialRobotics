@@ -1,6 +1,6 @@
 # IndustrialRobotics
 ## ** Read Me **
-Fruit picking robot project
+Fruit Loops - Fruit Harvest and QA System
 
 ## Collaborators and Contribution
 Dennis Nguyen | Yummi-305 | dennis.t.nguyen-1@student.uts.edu.au  
