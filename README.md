@@ -8,6 +8,7 @@ Dennis Nguyen | Yummi-305 | dennis.t.nguyen-1@student.uts.edu.au
 - Environment Class and Environment Model implementation  
 - Safety Model implementation  
 - Panda Robot Model and Class
+- Light Curtain Plot
 - BabyCow Class (Custom cow robot)
 - Path planning and implementation of robot movement for one robot at a time  
 - Robot simulation scenario implementation - manual vs autonomous, Harvest only, QA only, Harvest & QA  
@@ -23,7 +24,9 @@ Julien Wang | JW-355 | julien.wang@student.uts.edu.au
 Thomas Parish | tom-parish | thomas.parish-2@student.uts.edu.au  
 - Gripper Model and Class  
 - Implementation of robot movement for two robots at a time  
-- Implementation of e-stop and resume  
+- Implementation of e-stop
+- Implementation of resume from e-stop
+- Implementation of resume if autonomous -> e-stop -> manual mode (can return to autonomous)
 - Usage of real UR3 robot  
 - Vision, voice, and video editing of 1-minute and 3-minute video  
 
