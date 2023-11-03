@@ -625,7 +625,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 targetVec = [pos(1)-cowpoint(1), pos(2)-cowpoint(3), pos(3)-cowpoint(2)];
                 magn = norm(targetVec);
                 normalisedTarg = targetVec/magn;
-                targetDist = -.2;
+                targetDist = .2;
                 
                 for i = 1:steps
                     newPoint = [cowpoint(1) - targetDist*normalisedTarg(1), cowpoint(2) + targetDist*normalisedTarg(3), cowpoint(3) + targetDist*normalisedTarg(2)];
