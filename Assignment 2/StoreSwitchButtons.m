@@ -15,5 +15,13 @@ classdef StoreSwitchButtons
          end
          out = manual;
       end
+
+      function out = setgetCow(data)
+         persistent MooCow;
+         if nargin
+            MooCow = data;
+         end
+         out = MooCow;
+      end
    end
 end

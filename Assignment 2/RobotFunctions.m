@@ -21,6 +21,8 @@ classdef RobotFunctions
             %% Set eStop bool to false
             StoreSwitchButtons.setgeteStop(false);
             StoreSwitchButtons.setgetManual(false);
+            StoreSwitchButtons.setgetCow(false);
+
             robotcount = 1;
               
 
@@ -78,7 +80,7 @@ classdef RobotFunctions
                 for i = 1:steps
                     
                     %Check estop at each step
-                    [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+                    [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual, StoreSwitchButtons.setgetCow);
 
                     if eStopValue == true
 
@@ -215,6 +217,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             %% Set eStop bool to false
             StoreSwitchButtons.setgeteStop(false);
             StoreSwitchButtons.setgetManual(false);
+            StoreSwitchButtons.setgetCow(false);
 
             robotcount = 2;
 
@@ -334,7 +337,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
 
                     %check for active estop
-                   [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+                   [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual,StoreSwitchButtons.setgetCow);
 
                     if eStopValue == true
 
@@ -658,13 +661,14 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
              % end
 
-             disp('stop loop run check') %debugging number of run times
-
-             [eStopValue, ManualCheckValue] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
+             %disp('stop loop run check') %debugging number of run times
+                
+             %%check for change in estop value
+             [eStopValue, ManualCheckValue, ] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual,StoreSwitchButtons.setgetCow);
 
                 
-                %% need to make edits here
-                if (ManualCheckValue == true && eStopValue == false)
+                %% need to make edits here for teach control
+                if (StoreSwitchButtons.setgetManual == true && StoreSwitchButtons.setgeteStop == false)
 
                     disp('Exit to Manual Overide')
 
@@ -672,10 +676,25 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                 end
                 
-                if eStopValue == false
+                if StoreSwitchButtons.setgeteStop == false
                    
                     disp('Resume Harvest/QA')
                     
+                    break 
+                end
+
+                if StoreSwitchButtons.setgetCow == true 
+                    
+                    disp('Shoo Cow....')
+
+                    pause(2)
+
+                    %% MoveCow away function here
+
+%%
+                    StoreSwitchButtons.setgetCow(false);
+                    StoreSwitchButtons.setgeteStop(false);
+
                     break 
                 end
                 
@@ -693,21 +712,23 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
     
 %% Check eStop's Value to see if changed in app.
 
-function [eStopValue, ManualCheckValue] = Check_eStop(check_estopvalue,check_manual)
+function [eStopValue, ManualCheckValue, CowMovement] = Check_eStop(check_estopvalue,check_manual,check_cow)
 
 
                 eStopValue = check_estopvalue;
                 ManualCheckValue = check_manual; 
 
-                if (StoreSwitchButtons.setgeteStop == true)
-                    
-                ValueCheck = eStopValue;
-                disp('STOP recognised')
+                CowMovement = check_cow;
 
-                pause(2)
+                if (StoreSwitchButtons.setgeteStop == true)
+
+                %ValueCheck = eStopValue;
+                %disp('STOP recognised')
+
+                pause(0.02)
 
                 elseif (StoreSwitchButtons.setgeteStop == false)
-                    
+
 
                 end
 
