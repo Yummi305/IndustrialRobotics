@@ -97,9 +97,13 @@ classdef RobotFunctions
                     end
 
                     % To check for collisions against self and ground
-                    groundCheck = collF.collisionGroundLPI(robot);
+                    if strcmp(robot.plyFileNameStem, 'BabyCow')
+                        groundCheck = 2;
+                    else
+                        groundCheck = collF.collisionGroundLPI(robot);
+                    end
                     selfCheck = collF.collisionCheckSelf(robot, qMatrix(i, :));
-
+                    
                     if selfCheck || groundCheck == 1
                         disp('(potential) Collision! Avoiding...')
                         poseNow = robot.model.getpos();
@@ -204,7 +208,7 @@ classdef RobotFunctions
   
 
 %% Dual Robot Movement
-function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
+function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2, cow)
             % move end effector to specified location and carry bricks if required
             
             
@@ -249,7 +253,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
             pose_2 = robot2.model.fkine(q0_2);
             q1_2 = robot2.model.ikcon(pose_2, q0_2);
             q2_2 = robot2.model.ikcon(endMove2, q0_2);
-
+            
           
             % qMatrix calculation - smooth velocity and acceleration profiles
             % Method 1 Quintic Polynomial
@@ -311,6 +315,23 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 i = 1;
                 while i < steps
                     % Animation of Robot
+                    
+                    %if cowcall == 1
+                    % moveCow in 
+                    % called = 1
+                    % end
+
+                    %if called == 1
+                    cowCheck = collisionCheck.lightcurtainCheck(cow);
+                    if cowCheck == true
+                        StoreSwitchButtons.setgeteStop(true);
+%                         StoreSwitchButtons.setgetCow(true);
+                    end
+                    % cowcall = 0
+                    % called = 0
+                    % end
+
+
 
                     %check for active estop
                    [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual);
@@ -438,17 +459,57 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     if groundCheck1 == 1 || selfCheck1
                         disp('Collision robot 1 Detected!');
                         % calculate new position to avoid collision
+                        if i < 5
+                            disp('giving time to move')
+                            drawnow();
+                            i = i+1;
+                            continue
+                        end
                         if i <= 1
                             poseA = robot.model.getpos();
                         else
                             poseA = qMatrix(i-1, :); % robot has moved at least once before being checked, i = 0 not possible
                         end
                         pointA = robot.model.fkineUTS(poseA);
-                        pointAadj = pointA(1:3, 4);
+                        pointAvec = pointA(1:3, 4);
                         poseAnext = robot.model.fkineUTS(qMatrix(i,:));
+
+                        nextpointAvec = poseAnext(1:3, 4);
+                        targetVec = [nextpointAvec(1)-pointAvec(1), nextpointAvec(2)-pointAvec(2), nextpointAvec(3)-pointAvec(3)];
+                        magn = norm(targetVec);
+                        normalisedTarg = targetVec/magn;
+                        targetDist = -rand(1);
+                        newPoint = [pointAvec(1)+targetDist*normalisedTarg(1)-1, pointAvec(2)+targetDist*normalisedTarg(2), 1+pointAvec(3)+targetDist*normalisedTarg(3)];
+                        if groundCheck2 == 1
+                            newPoint =[pointAvec(1)+targetDist*normalisedTarg(1), pointAvec(2)+targetDist*normalisedTarg(2), pointAvec(3)+targetDist*normalisedTarg(3)+1.4];
+                        end
+%                         avoidPointB = pointB*inv(poseBnext)*(pointB) * transl(-.01,-.01, 0)*trotz(-pi/10);
+                        if isrow(newPoint)
+                            newPoint = newPoint';
+                        end
+                        newPoint = [newPoint; 1];
+                        randRot = trotz((rand()-.5)*pi/4)*trotx((rand()-.5)*pi/12);
+                        pointA = pointA*randRot;
+                        avoidPointA = [pointA(:, 1:3), newPoint];
+
+                        
+
+
                         avoidPointA = pointA*inv(poseAnext)*pointA;
                         avoidPoseA = robot.model.ikcon(avoidPointA, poseA); % point for robot to avoid collision
 
+                        % using basic RRT
+                        planner = collisionCheck.collisionCheckSelf(robot, robot.model.getpos());
+                        qRand = robot.model.getpos() + .5*(2 * rand(1,length(robot.model.links)) - 1) * pi;
+                        qRand(1) = poseA(1) + (rand(1)-.5)*.05;
+                        trials = 0;
+                        while planner == true
+                            qRand = robot.model.getpos() + .25*(2 * rand(1,length(robot.model.links)) - 1) * pi;
+                            qRand(1) = poseA(1) + (rand(1)-.5)*.05;
+                            planner = collisionCheck.collisionCheckSelf(robot, qRand);
+                            trials = trials +1
+                        end
+                        avoidPoseA = qRand
                         if i <= 1
                             poseB = robot2.model.getpos();
                         else
@@ -461,9 +522,11 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                         firstqMatrix = (1-s1)*poseA + s1*avoidPoseA;
                         s2 = lspb(0,1, steps - sideSteps); 
                         secondqMatrix = (1-s2)*firstqMatrix(sideSteps, :) + s2*q2;
+                        
                         % robot2 likely unaffected, remake current trajectory
                         s3 = lspb(s(i),1, steps);
                         qMatrix2 = (1-s3)*poseB + s3*q2_2;
+                        
 
                         qMatrix = [firstqMatrix; secondqMatrix];
                         
@@ -539,6 +602,29 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     i = i + 1;
                 end
             
+            end
+
+
+            function moveCow(cow, pos, steps)
+                % take cow position
+                cowpos = cow.model.base();
+                cowpoint = cowpos(1:3, 4);
+                targetVec = [pos(1)-cowpoint(1), pos(2)-cowpoint(2), pos(3)-cowpoint(3)];
+                magn = norm(targetVec);
+                normalisedTarg = targetVec/magn;
+                targetDist = 1/steps;
+                for i = 1:steps
+                    
+                    newPoint = [cowpoint(1) + targetDist*normalisedTarg(1), cowpoint(2) + targetDist*normalisedTarg(2), cowpoint(3) + targetDist*normalisedTarg(3)];
+                    if isrow(newPoint)
+                        newPoint = newPoint';
+                    end
+                    newPoint = [newPoint; 1];
+                    cowRote = cowpos(:,1:3);
+                    cowTrans = [cowRote, newPoint];
+                    cow.model.base = cow.model.base*cowTrans;
+                    drawnow();
+                end
             end
 
             function [ReturnPosition,RobotsQ] = eStop(QpositionMat, RobotNumber) % original gripper move function repurposed to inital movement only as other components are inside robot model move. %robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos

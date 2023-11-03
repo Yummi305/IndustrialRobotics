@@ -288,8 +288,17 @@ QAgrip2 = (QA.model.fkineUTS(QA.model.getpos()))* transl(0,0.127,0.215);
 pointA = QAgrip1(1:3,4);
 pointB = QAgrip2(1:3,4);
 
-LPIcheck([0,0,1], [0,0,0], [pointA(1), pointA(2), pointA(3)], [pointB(1), pointB(2), pointB(3)])
-LPIcheck([0,0,1], [0,0,0], [pointC(1), pointC(2), pointC(3)], [pointD(1), pointD(2), pointD(3)])
+%% LPI
+% Given a plane (normal and point) and two points that make up another line, get the intersection
+% Check == 0 if there is no intersection
+% Check == 1 if there is a line plane intersection between the two points
+% Check == 2 if the segment lies in the plane (always intersecting)
+% Check == 3 if there is intersection point which lies outside line segment
+curtainPoints = [-1.7,0.7; -1.7,-1.8; 1,0.7; 1,-1.8];
+
+LPIcheck([1,0,0], [curtainPoints(1, 1),curtainPoints(1, 2),0], [-1.8,.7,1], [-1.6,0.7,1])
+LPIcheck([.5,0,0], [curtainPoints(1, 1),curtainPoints(1, 2),0], [-1.7,.6,1], [-1.7,0.8,1])
+% LPIcheck([0,0,1], [0,0,0], [pointC(1), pointC(2), pointC(3)], [pointD(1), pointD(2), pointD(3)])
 
 %% Test ground collision detection
 
