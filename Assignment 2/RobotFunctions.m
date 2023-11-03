@@ -14,7 +14,7 @@ classdef RobotFunctions
         end  
         
         %% Robot Movement
-        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
+        function qEnd = MoveRobot(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,cow)
             % move end effector to specified location and carry bricks if required
             % Obtain robots current position and desired position to form qMatrix
 
@@ -82,7 +82,7 @@ classdef RobotFunctions
 
                     if StoreSwitchButtons.setgetCow() == 1
                         RobotFunctions.moveCow(cow, [.5, -.5, 0], 5);
-                        cowCheck = collisionCheck.lightcurtainCheck(cow);
+                        cowCheck = collF.lightcurtainCheck(cow);
                         if cowCheck == true
                             StoreSwitchButtons.setgeteStop(true);
                             StoreSwitchButtons.setgetCow(true);
@@ -333,13 +333,15 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Animation of Robot
                     
                     if StoreSwitchButtons.setgetCow() == 1
-                        RobotFunctions.moveCow(cow, [.5, -.5, 0], 5);
+                        RobotFunctions.moveCow(cow, [-2.5, -.5, 0], 5);
                         cowCheck = collisionCheck.lightcurtainCheck(cow);
                         if cowCheck == true
                             StoreSwitchButtons.setgeteStop(true);
-                            StoreSwitchButtons.setgetCow(true);
+%                             StoreSwitchButtons.setgetCow(true);
                         end
-                        StoreSwitchButtons.setgetCow(false);
+                        RobotFunctions.moveCow(cow, [2.5, -.5, 0], 5);
+
+%                         StoreSwitchButtons.setgetCow(false);
                     end
 
 
@@ -618,22 +620,23 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
             function moveCow(cow, pos, steps)
                 % take cow position
-                cowpos = cow.model.base();
+                cowpos = cow.model.base().T;
                 cowpoint = cowpos(1:3, 4);
-                targetVec = [pos(1)-cowpoint(1), pos(2)-cowpoint(2), pos(3)-cowpoint(3)];
+                targetVec = [pos(1)-cowpoint(1), pos(2)-cowpoint(3), pos(3)-cowpoint(2)];
                 magn = norm(targetVec);
                 normalisedTarg = targetVec/magn;
-                targetDist = 1/steps;
+                targetDist = -.2;
                 
                 for i = 1:steps
-                    newPoint = [cowpoint(1) + targetDist*normalisedTarg(1), cowpoint(2) + targetDist*normalisedTarg(2), cowpoint(3) + targetDist*normalisedTarg(3)];
+                    newPoint = [cowpoint(1) - targetDist*normalisedTarg(1), cowpoint(2) + targetDist*normalisedTarg(3), cowpoint(3) + targetDist*normalisedTarg(2)];
                     if isrow(newPoint)
                         newPoint = newPoint';
                     end
                     newPoint = [newPoint; 1];
                     cowRote = cowpos(:,1:3);
                     cowTrans = [cowRote, newPoint];
-                    cow.model.base = cow.model.base*cowTrans;
+                    cow.model.base = cow.model.base*SE3(cowTrans);
+                    cow.model.animate(cow.model.getpos());
                     drawnow();
                 end
 

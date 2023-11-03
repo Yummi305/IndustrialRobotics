@@ -128,6 +128,9 @@ classdef CollisionFunctions
                 [self.ellipX, self.ellipY, self.ellipZ] = ellipsoid(self.centreJoints{j}(1), self.centreJoints{j}(2), self.centreJoints{j}(3), self.jointX, self.jointY, self.linkLeng(j)); % generate points per link
 %                 self.JointEllipse(j) = surf(self.ellipX, self.ellipY, self.ellipZ); % generates the ellipse
 %                 Jrot = rad2deg(jointTr(j).tr2rpy);
+%                   if j == 2 && strcmp(robot.plyFileNameStem,'LinearUR3')
+%                       Jrot(1) = Jrot(1)+90;
+%                   end
 %                 rotate(self.JointEllipse(j), [0 0 1], Jrot(3), self.centreJoints{j});
 %                 rotate(self.JointEllipse(j), [0 1 0], Jrot(2), self.centreJoints{j});
 %                 rotate(self.JointEllipse(j), [1 0 0], Jrot(1), self.centreJoints{j});
@@ -150,10 +153,6 @@ classdef CollisionFunctions
                 gripZ = .05;
 %                 jointTr = jointTr([1:3, 5, 7, 9, 11]);
                 self.linkLeng = [.25 0.001 .160 0.071 .075 0.091 .095 0.091 0.051 .081 0.001];
-                
-
-                
-
             end
             for i = 2:length(jointTr)
                 centre = .5*(jointTr(i - 1).t + jointTr(i).t);
@@ -274,8 +273,84 @@ classdef CollisionFunctions
             end
         end
 
+        function check = lightcurtainCheck(self, cow)
+            curtainPoints = [-1.7,0.7; 
+                            -1.7,-1.8; 
+                             1,0.7;
+                             1,-1.8];
+            point1 = cow.model.base*SE3(transl(-.4, 0, 0));
+            point1 = point1.T;
+            point1 = point1(1:3, 4);
+            point2 = cow.model.base*SE3(transl(.4, 0, 0));
+            point2 = point2.T;
+            point2 = point2(1:3, 4);
+%             pointPlane;
+            Normals = {[1, 0, 0],  [0, 1, 0]}; % normal to x, normal to y
+            count = 0;
+            
+
+            for i = 1:length(curtainPoints)
+                
+                pointPlane = curtainPoints(i);
+                for j = 1:length(Normals)
+                    planeNormal = Normals{j};
+                    u = point2 - point1;
+                    w = point1 - pointPlane;
+                    D = dot(planeNormal,u);
+                    N = -dot(planeNormal,w);
+
+                    outp= 0; %#ok<NASGU>
+                    if abs(D) < 10^-7        % The segment is parallel to plane
+                        if N == 0           % The segment lies in plane
+                            outp= 2;
+                            
+                        else
+                            outp = 0;       %no intersection
+                            
+                        end
+                    end
+
+                    %compute the intersection parameter
+                    sI = N / D;
+                    intersectionPoint = point1+ sI.*u;
+
+                    if (sI < 0 || sI > 1)
+                        outp= 3;          %The intersection point  lies outside the segment, so there is no intersection
+                    else
+                        outp=1;
+                    end
+
+                    % check for points inside the curtain
+                    for a = 1:length(curtainPoints)
+                        if point1(1) >= curtainPoints(1, 1) && point1(1) <= curtainPoints(3, 1)
+                            count = count+1;
+                        end
+                        if point1(2) >= curtainPoints(2, 2) && point1(2) <= curtainPoints(3, 2)
+                            count = count+1;
+                        end
+                        if point2(1) >= curtainPoints(1, 1) && point2(1) <= curtainPoints(3, 1)
+                            count2 = count+1;
+                        end
+                        if point2(2) >= curtainPoints(2, 2) && point2(2) <= curtainPoints(3, 2)
+                            count2 = count+1;
+                        end
+                        if count >= 2 || outp == 1 || count2 >= 2
+                            check = true;
+                            return
+                        end
+                    end
+                end
+            end
+                
+            
+
+            % LPI check on the points
+            
+        end
     end
 end
+    
+
 
 
 % function algebraicDist = GetAlgebraicDist(points, centerPoint, radii)
