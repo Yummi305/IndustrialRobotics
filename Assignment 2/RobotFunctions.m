@@ -81,7 +81,9 @@ classdef RobotFunctions
                     
 
                     if StoreSwitchButtons.setgetCow() == 1
-                        RobotFunctions.moveCow(cow, [.5, -.5, 0], 5);
+                        cow.model.base = transl(1, -.5, 0.01);
+                        cow.model.animate(cow.model.getpos());
+                        drawnow;
                         cowCheck = collF.lightcurtainCheck(cow);
                         if cowCheck == true
                             StoreSwitchButtons.setgeteStop(true);
@@ -333,13 +335,15 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     % Animation of Robot
                     
                     if StoreSwitchButtons.setgetCow() == 1
-                        RobotFunctions.moveCow(cow, [-2.5, -.5, 0], 5);
+                        cow.model.base = transl(1, -.5, 0.01);
+                        cow.model.animate(cow.model.getpos());
+                        drawnow;
                         cowCheck = collisionCheck.lightcurtainCheck(cow);
                         if cowCheck == true
                             StoreSwitchButtons.setgeteStop(true);
 %                             StoreSwitchButtons.setgetCow(true);
                         end
-                        RobotFunctions.moveCow(cow, [2.5, -.5, 0], 5);
+                        
 
 %                         StoreSwitchButtons.setgetCow(false);
                     end
@@ -701,7 +705,9 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     pause(2)
 
-                    moveCow(cow, [1.9, -.5, 0], 7);
+                    cow.model.base = transl(2, -.5, 0.01);
+                        cow.model.animate(cow.model.getpos());
+                        drawnow;
                     
 
 %%
