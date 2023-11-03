@@ -104,7 +104,7 @@ classdef RobotFunctions
 
                     StopQs = [Bot_pos Grip1_pos Grip2_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(StopQs,robotcount); %robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos
+                    RobotFunctions.eStop(StopQs,robotcount,cow); %robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos
 
                     disp ('Stop success, Return to loop')
                     else
@@ -223,7 +223,7 @@ classdef RobotFunctions
   
 
 %% Dual Robot Movement
-function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2, cow)
+function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip,robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2,cow)
             % move end effector to specified location and carry bricks if required
             
             
@@ -358,7 +358,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
                     StopQs = [Harvest_pos Grip1_pos Grip2_pos, Panda_pos Grip3_pos Grip4_pos]; %Set stopQ container to store q values of each bot row 1 [robot, grip1, grip2] row 2 [robot2, grip3, grip 4]
 
-                    RobotFunctions.eStop(StopQs,robotcount); % removed -robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,
+                    RobotFunctions.eStop(StopQs,robotcount,cow); % removed -robot,Harvest_pos,g_1,Grip1_pos,g_2,Grip2_pos,robot2,Panda_pos,g_3,Grip3_pos,g_4,Grip4_pos,
 
                     else
 
@@ -639,7 +639,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
 
             end
 
-            function [ReturnPosition,RobotsQ] = eStop(QpositionMat, RobotNumber) % original gripper move function repurposed to inital movement only as other components are inside robot model move. %robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos
+            function [ReturnPosition,RobotsQ] = eStop(QpositionMat, RobotNumber,cowModel) % original gripper move function repurposed to inital movement only as other components are inside robot model move. %robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos
         
         ReturnPosition = QpositionMat;
         RobotsQ = RobotNumber;
@@ -695,9 +695,10 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 if StoreSwitchButtons.setgetCow == true 
                     
                     disp('Shoo Cow....')
-                    moveCow(cow, [1.9, -.5, 0], 7);
+
                     pause(2)
 
+                    moveCow(cow, [1.9, -.5, 0], 7);
                     
 
 %%
@@ -731,8 +732,6 @@ function [eStopValue, ManualCheckValue, CowMovement] = Check_eStop(check_estopva
 
                 if (StoreSwitchButtons.setgeteStop == true)
 
-                %ValueCheck = eStopValue;
-                %disp('STOP recognised')
 
                 pause(0.02)
 
