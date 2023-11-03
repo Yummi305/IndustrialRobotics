@@ -79,6 +79,19 @@ classdef RobotFunctions
             % Execute the motion
                 for i = 1:steps
                     
+
+                    if StoreSwitchButtons.setgetCow() == 1
+                        RobotFunctions.moveCow(cow, [.5, -.5, 0], 5);
+                        cowCheck = collisionCheck.lightcurtainCheck(cow);
+                        if cowCheck == true
+                            StoreSwitchButtons.setgeteStop(true);
+                            StoreSwitchButtons.setgetCow(true);
+                        end
+                        StoreSwitchButtons.setgetCow(false);
+                    end
+
+
+
                     %Check estop at each step
                     [eStopValue, ~] = RobotFunctions.Check_eStop(StoreSwitchButtons.setgeteStop,StoreSwitchButtons.setgetManual, StoreSwitchButtons.setgetCow);
 
@@ -319,20 +332,15 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 while i < steps
                     % Animation of Robot
                     
-                    %if cowcall == 1
-                    % moveCow in 
-                    % called = 1
-                    % end
-
-                    %if called == 1
-                    cowCheck = collisionCheck.lightcurtainCheck(cow);
-                    if cowCheck == true
-                        StoreSwitchButtons.setgeteStop(true);
-%                         StoreSwitchButtons.setgetCow(true);
+                    if StoreSwitchButtons.setgetCow() == 1
+                        RobotFunctions.moveCow(cow, [.5, -.5, 0], 5);
+                        cowCheck = collisionCheck.lightcurtainCheck(cow);
+                        if cowCheck == true
+                            StoreSwitchButtons.setgeteStop(true);
+                            StoreSwitchButtons.setgetCow(true);
+                        end
+                        StoreSwitchButtons.setgetCow(false);
                     end
-                    % cowcall = 0
-                    % called = 0
-                    % end
 
 
 
@@ -616,8 +624,8 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 magn = norm(targetVec);
                 normalisedTarg = targetVec/magn;
                 targetDist = 1/steps;
+                
                 for i = 1:steps
-                    
                     newPoint = [cowpoint(1) + targetDist*normalisedTarg(1), cowpoint(2) + targetDist*normalisedTarg(2), cowpoint(3) + targetDist*normalisedTarg(3)];
                     if isrow(newPoint)
                         newPoint = newPoint';
@@ -628,6 +636,7 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                     cow.model.base = cow.model.base*cowTrans;
                     drawnow();
                 end
+
             end
 
             function [ReturnPosition,RobotsQ] = eStop(QpositionMat, RobotNumber) % original gripper move function repurposed to inital movement only as other components are inside robot model move. %robot1,r1_currentpos,g_1,g1_currentpos,g_2,g2_currentpos,robot2, r2_currentpos,g_3,g3_currentpos,g_4,g4_currentpos
@@ -686,10 +695,10 @@ function MoveTwoRobots(robot,position,steps,payload,holdingObject, vertices, end
                 if StoreSwitchButtons.setgetCow == true 
                     
                     disp('Shoo Cow....')
-
+                    moveCow(cow, [1.9, -.5, 0], 7);
                     pause(2)
 
-                    %% MoveCow away function here
+                    
 
 %%
                     StoreSwitchButtons.setgetCow(false);
