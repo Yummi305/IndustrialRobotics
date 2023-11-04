@@ -27,6 +27,7 @@ Thomas Parish | tom-parish | thomas.parish-2@student.uts.edu.au
 - Implementation of e-stop
 - Implementation of resume from e-stop
 - Implementation of resume if autonomous -> e-stop -> manual mode (can return to autonomous)
+- Panda Robot DH paramter calculations and ply file adjustment
 - Usage of real UR3 robot  
 - Vision, voice, and video editing of 1-minute and 3-minute video  
 
