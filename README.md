@@ -8,11 +8,14 @@ Dennis Nguyen | Yummi-305 | dennis.t.nguyen-1@student.uts.edu.au
 - Environment Class and Environment Model implementation  
 - Safety Model implementation  
 - Panda Robot Model and Class
+- Light Curtain Plot
 - BabyCow Class (Custom cow robot)
 - Path planning and implementation of robot movement for one robot at a time  
 - Robot simulation scenario implementation - manual vs autonomous, Harvest only, QA only, Harvest & QA  
 - Manual controls / 'teach' functionality of robot and gripper for both robots  
-- Recording simulation clips for 1-minute and 3-minte video  
+- Recording simulation clips for 1-minute and 3-minte video
+- Lead on project plan and attainable task planning for each meeting
+- Lead on ReadME file and explaination
 
 Julien Wang | JW-355 | julien.wang@student.uts.edu.au  
 - Implementation of Collision Detection and avoidance system
@@ -21,9 +24,14 @@ Julien Wang | JW-355 | julien.wang@student.uts.edu.au
 - Recording simulation clips for 1-minute and 3-minte video  
 
 Thomas Parish | tom-parish | thomas.parish-2@student.uts.edu.au  
-- Gripper Model and Class  
+- Gripper Model and Class
+- Implementation of Gripper Movement with model in bot move functions
 - Implementation of robot movement for two robots at a time  
-- Implementation of e-stop and resume  
+- Implementation of e-stop
+- Implementation of resume from e-stop
+- Implementation of resume if autonomous -> e-stop -> manual mode (can return to autonomous)
+- Implementation of shared variables between classes for estop, manual mode and cow model mode
+- Panda Robot DH paramter calculations and ply file adjustment
 - Usage of real UR3 robot  
 - Vision, voice, and video editing of 1-minute and 3-minute video  
 
