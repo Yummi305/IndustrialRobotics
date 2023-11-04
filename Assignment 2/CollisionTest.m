@@ -9,7 +9,7 @@ harvest_toggle = true;
 QA_toggle = true;
 
 % Create instance of Robot Functions Class in order to access functions
-% robotFunctions = RobotFunctions();
+robotFunctions = RobotFunctions();
 
 % Create instance of Brick Functions Class in order to access functions
 objFunc = ObjectFunctions();
@@ -160,6 +160,7 @@ else
     [tree2_obj,tree2_verts] = objFunc.GrowMandarins('Mandarin_ripe.ply','Mandarin_OverRipe.ply',tree2_pos,tree2_obj,tree2_verts);
 end
 
+% Generate robots
 %% Generate LinearUR3
 % Initialise LinearUR3
 harvestBot = LinearUR3(transl(0,0,0.02));
@@ -175,7 +176,7 @@ g2 = GripLeft(pos2); % initial left gripper
 
 % robotFunctions.GripperMove(g1,g2,1); % Close Gripper to operating distance for Mandarin (open close 10 degrees)
 
-% Generate Franka Emika (Panda)
+%% Generate Franka Emika (Panda)
 QA = Panda(transl(-0.6,-0.8,0.02));
 
 
@@ -203,6 +204,17 @@ clc
 % robot2,position2,payload2,holdingObject2, vertices2, endEffDirection2,g_3,g_4,grip2)
 % robotFunctions.MoveTwoRobots(harvestBot,[-0.68, -.2, 0.443],50,0,false,0,3,g1,g2,2, ...
 %                             QA,[-0.679,-0.4,.68],0,false,0,2,g3,g4,2);
+
+%% UR3 collision test
+% testmove(robot,position,steps,payload,holdingObject, vertices, endEffDirection,g_1,g_2,grip)
+clc
+testmove(harvestBot, [-0.95, 0.43, 0.47], 35, 0, false, 0, 1, g1, g2, 0);
+testmove(harvestBot, [-0.55,-0.37,0.84], 35, 0, false, 0, 2, g1, g2, 0);
+testmove(harvestBot, [-0.55,-0.37,0.34], 35, 0, false, 0, 2, g1, g2, 0);
+testmove(harvestBot, [-1, 0.38, 0.51], 35, 0, false, 0, 1, g1, g2, 0);
+
+testmove(harvestBot, [-0.75,-0.37,0.04], 35, 0, false, 0, 2, g1, g2, 0);
+
 
 %% Franka self collision test
 clc
@@ -301,8 +313,10 @@ LPIcheck([.5,0,0], [curtainPoints(1, 1),curtainPoints(1, 2),0], [-1.7,.6,1], [-1
 % LPIcheck([0,0,1], [0,0,0], [pointC(1), pointC(2), pointC(3)], [pointD(1), pointD(2), pointD(3)])
 
 %% Test ground collision detection
-
-robotFunctions.MoveRobot(QA, [-.47, -.7, .75], 100,0,false,0,1,g3,g4,0);
+clf
+hold on
+cow = BabyCow(transl(2,2,0));
+robotFunctions.MoveRobot(QA, [-.47, -.7, .75], 100,0,false,0,1,g3,g4,0, cow);
 
 testmove(QA, [.347, -.27, .1], 100,0,false,0,2,g3,g4,2);
 
@@ -339,81 +353,91 @@ end
 
 % Collision detection functions
 collF = CollisionFunctions();
-
-for i = 1:steps
+sideSteps = steps - 15;
+i = 1;
+while i < steps
     % Animation of Robot
     groundCheck = collF.collisionGroundLPI(robot); % variable to store if end effector will hit ground
     if collF.collisionCheckSelf(robot, qMatrix(i, :)) || groundCheck == 1  
+        if i < 5
+            disp('giving time to move')
+            drawnow();
+            i = i+1;
+            continue
+        end
         disp('(potential) Collision! Avoiding...')
-        poseNow = robot.model.getpos();
-        pointNow = robot.model.fkine(poseNow).T;
-        pointNext = robot.model.fkine(qMatrix(i,:));
-        pointAdj = pointNow;
-        pointAdj = SE3(pointAdj(1:3, 4));
-        invNext = SE3(inv(pointNext));
-        pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj); % aim directly away from collision
-        poseAvoid = robot.model.ikcon(pointAvoid, poseNow);
-        %         robot.model.animate(poseAvoid); % move the robot away from collision
-        
-        
-        sideStep = 30;
-        pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj);
-        q1 = robot.model.ikcon(pointNow,poseNow);
-        q2 = robot.model.ikcon(pointAvoid, poseNow);
-        s = lspb(0,1,sideStep);  % First, create the scalar function
-        newqMatrix = nan(sideStep,length(robot.model.links));  % Create memory allocation for variables
-        newqMatrix = (1-s)*q1 + s*q2;
-        disp('new traj')
-        for a = 1:sideStep
-            robot.model.animate(newqMatrix(a,:));
-            
-%             robot.model.getpos();
-
-            %         pause()
-            pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
-            pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
-            g_1.model.base = pos1;
-            g_2.model.base = pos2;
-            g_1.model.animate(g_1.model.getpos());
-            g_2.model.animate(g_2.model.getpos());
-            drawnow()
-        end
-        
-        % regenerate new trajectory to endpoint
-        q0 = robot.model.getpos();
-        pose = robot.model.fkine(q0);
-        q1 = robot.model.ikcon(pose, q0);
-        
-        % To adjust final position upward if input is too low (z is negative)
-%       if groundCheck == 1
-%             endMove = transl(0,0,.1)*endMove; % adjust endMove upwards if in ground
+        qMatrix =  collF.remakeTraj(robot, sideSteps, steps, q2);
+        i = 1;
+        collF.visualiseEllips(robot, 5);
+%         poseNow = robot.model.getpos();
+%         pointNow = robot.model.fkine(poseNow).T;
+%         pointNext = robot.model.fkine(qMatrix(i,:));
+%         pointAdj = pointNow;
+%         pointAdj = SE3(pointAdj(1:3, 4));
+%         invNext = SE3(inv(pointNext));
+%         pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj); % aim directly away from collision
+%         poseAvoid = robot.model.ikcon(pointAvoid, poseNow);
+%         %         robot.model.animate(poseAvoid); % move the robot away from collision
+%         
+%         
+%         sideStep = 30;
+%         pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj);
+%         q1 = robot.model.ikcon(pointNow,poseNow);
+%         q2 = robot.model.ikcon(pointAvoid, poseNow);
+%         s = lspb(0,1,sideStep);  % First, create the scalar function
+%         newqMatrix = nan(sideStep,length(robot.model.links));  % Create memory allocation for variables
+%         newqMatrix = (1-s)*q1 + s*q2;
+%         disp('new traj')
+%         for a = 1:sideStep
+%             robot.model.animate(newqMatrix(a,:));
+%             
+% %             robot.model.getpos();
+% 
+%             %         pause()
+%             pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+%             pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+%             g_1.model.base = pos1;
+%             g_2.model.base = pos2;
+%             g_1.model.animate(g_1.model.getpos());
+%             g_2.model.animate(g_2.model.getpos());
+%             drawnow()
 %         end
-        q2 = robot.model.ikcon(endMove, q0);
-        
-        s = lspb(0,1,steps);  % First, create the scalar function
-        qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
-        qMatrix = (1-s)*q1 + s*q2;
-%         for a = 1:steps
-%             qMatrix(a,:) = (1-s(a))*q1 + s(a)*q2;
+%         
+%         % regenerate new trajectory to endpoint
+%         q0 = robot.model.getpos();
+%         pose = robot.model.fkine(q0);
+%         q1 = robot.model.ikcon(pose, q0);
+%         
+%         % To adjust final position upward if input is too low (z is negative)
+% %       if groundCheck == 1
+% %             endMove = transl(0,0,.1)*endMove; % adjust endMove upwards if in ground
+% %         end
+%         q2 = robot.model.ikcon(endMove, q0);
+%         
+%         s = lspb(0,1,steps);  % First, create the scalar function
+%         qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
+%         qMatrix = (1-s)*q1 + s*q2;
+% %         for a = 1:steps
+% %             qMatrix(a,:) = (1-s(a))*q1 + s(a)*q2;
+% %         end
+%         disp('Collision avoided')
+%         
+%         for b = 1:i-1
+%             robot.model.animate(qMatrix(b,:));
+%             
+% %             robot.model.getpos();
+% 
+%             %         pause()
+%             pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+%             pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+%             g_1.model.base = pos1;
+%             g_2.model.base = pos2;
+%             g_1.model.animate(g_1.model.getpos());
+%             g_2.model.animate(g_2.model.getpos());
+%             drawnow()
 %         end
-        disp('Collision avoided')
-        
-        for b = 1:i-1
-            robot.model.animate(qMatrix(b,:));
-            
-%             robot.model.getpos();
-
-            %         pause()
-            pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
-            pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
-            g_1.model.base = pos1;
-            g_2.model.base = pos2;
-            g_1.model.animate(g_1.model.getpos());
-            g_2.model.animate(g_2.model.getpos());
-            drawnow()
-        end
-        disp('Returning to main trajectory')
-        
+%         disp('Returning to main trajectory')
+%         
         
     end
 %     qMatrix(i,:) - robot.model.getpos()
@@ -430,6 +454,89 @@ for i = 1:steps
     g_1.model.animate(g_1.model.getpos());
     g_2.model.animate(g_2.model.getpos());
 
+    if collF.collisionCheckSelf(robot, qMatrix(i, :)) || groundCheck == 1  
+        if i < 5
+            disp('giving time to move')
+            drawnow();
+            i = i+1;
+            continue
+        end
+        disp('(potential) Collision! Avoiding...')
+        qMatrix =  collF.remakeTraj(robot, sideSteps, steps, q2);
+        i = 1;
+        collF.visualiseEllips(robot, 5);
+%         poseNow = robot.model.getpos();
+%         pointNow = robot.model.fkine(poseNow).T;
+%         pointNext = robot.model.fkine(qMatrix(i,:));
+%         pointAdj = pointNow;
+%         pointAdj = SE3(pointAdj(1:3, 4));
+%         invNext = SE3(inv(pointNext));
+%         pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj); % aim directly away from collision
+%         poseAvoid = robot.model.ikcon(pointAvoid, poseNow);
+%         %         robot.model.animate(poseAvoid); % move the robot away from collision
+%         
+%         
+%         sideStep = 30;
+%         pointAvoid = SE3(pointNow)*invNext*SE3(pointAdj);
+%         q1 = robot.model.ikcon(pointNow,poseNow);
+%         q2 = robot.model.ikcon(pointAvoid, poseNow);
+%         s = lspb(0,1,sideStep);  % First, create the scalar function
+%         newqMatrix = nan(sideStep,length(robot.model.links));  % Create memory allocation for variables
+%         newqMatrix = (1-s)*q1 + s*q2;
+%         disp('new traj')
+%         for a = 1:sideStep
+%             robot.model.animate(newqMatrix(a,:));
+%             
+% %             robot.model.getpos();
+% 
+%             %         pause()
+%             pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+%             pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+%             g_1.model.base = pos1;
+%             g_2.model.base = pos2;
+%             g_1.model.animate(g_1.model.getpos());
+%             g_2.model.animate(g_2.model.getpos());
+%             drawnow()
+%         end
+%         
+%         % regenerate new trajectory to endpoint
+%         q0 = robot.model.getpos();
+%         pose = robot.model.fkine(q0);
+%         q1 = robot.model.ikcon(pose, q0);
+%         
+%         % To adjust final position upward if input is too low (z is negative)
+% %       if groundCheck == 1
+% %             endMove = transl(0,0,.1)*endMove; % adjust endMove upwards if in ground
+% %         end
+%         q2 = robot.model.ikcon(endMove, q0);
+%         
+%         s = lspb(0,1,steps);  % First, create the scalar function
+%         qMatrix = nan(steps,length(robot.model.links));  % Create memory allocation for variables
+%         qMatrix = (1-s)*q1 + s*q2;
+% %         for a = 1:steps
+% %             qMatrix(a,:) = (1-s(a))*q1 + s(a)*q2;
+% %         end
+%         disp('Collision avoided')
+%         
+%         for b = 1:i-1
+%             robot.model.animate(qMatrix(b,:));
+%             
+% %             robot.model.getpos();
+% 
+%             %         pause()
+%             pos1 = robot.model.fkineUTS(robot.model.getpos())*transl(0,-0.0127,0.05)*troty(-pi/2);%z0.0612
+%             pos2 = robot.model.fkineUTS(robot.model.getpos())*transl(0,0.0127,0.05)*troty(-pi/2);%z0.0612
+%             g_1.model.base = pos1;
+%             g_2.model.base = pos2;
+%             g_1.model.animate(g_1.model.getpos());
+%             g_2.model.animate(g_2.model.getpos());
+%             drawnow()
+%         end
+%         disp('Returning to main trajectory')
+%         
+        
+    end
+
     %         if grip == 1 || grip == 2
     %             % Gripper open or close if necessary
     %             g_1.model.animate(qPath1(i,:));
@@ -443,6 +550,7 @@ for i = 1:steps
         transfromedVert = [vertices,ones(size(vertices,1),1)] * transMatrix'; % transform vertices of object at origin position by transformation matrix
         set(payload,'Vertices',transfromedVert(:,1:3));
     end
+    i = i + 1;
     drawnow();
 end
 end
