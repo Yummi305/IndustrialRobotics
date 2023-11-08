@@ -102,7 +102,7 @@ classdef CollisionFunctions
             if strcmp(robot.plyFileNameStem,'LinearUR3')
                 self.jointX = .058;
                 self.jointY = .058;
-                self.linkLeng = [.12 .098 .0435 .031 .032 .0853 .031];
+                self.linkLeng = [.12 .158 .075 .031 .032 .0853 .031];
                 rote = jointTr(2).tr2rpy;
                 jointAdj = transl(self.centreJoints{2});
                 jointAdj = jointAdj*trotx(rote(1))*troty(rote(2))*trotz(rote(3))*transl(0, -0.12, 0);
@@ -153,7 +153,7 @@ classdef CollisionFunctions
             if strcmp(robot.plyFileNameStem,'LinearUR3')
                 self.jointX = .058;
                 self.jointY = .058;
-                self.linkLeng = [.12 .098 .0435 .031 .032 .0853 .031];
+                self.linkLeng = [.12 .158 .0935 .031 .032 .0853 .031];
                 rote = jointTr(2).tr2rpy;
                 jointAdj = transl(self.centreJoints{2});
                 jointAdj = jointAdj*trotx(rote(1))*troty(rote(2))*trotz(rote(3))*transl(0, -0.12, 0);
@@ -162,7 +162,7 @@ classdef CollisionFunctions
             
             for j = 1:length(self.centreJoints)
                 self.centreJoints{j};
-                [self.ellipX, self.ellipY, self.ellipZ] = ellipsoid(self.centreJoints{j}(1), self.centreJoints{j}(2), self.centreJoints{j}(3), self.jointX, self.jointY, self.linkLeng(j)); % generate points per link
+%                 [self.ellipX, self.ellipY, self.ellipZ] = ellipsoid(self.centreJoints{j}(1), self.centreJoints{j}(2), self.centreJoints{j}(3), self.jointX, self.jointY, self.linkLeng(j)); % generate points per link
 %                 self.JointEllipse(j) = surf(self.ellipX, self.ellipY, self.ellipZ); % generates the ellipse
 %                 Jrot = rad2deg(jointTr(j).tr2rpy);
 %                   if j == 2 && strcmp(robot.plyFileNameStem,'LinearUR3')
@@ -171,10 +171,10 @@ classdef CollisionFunctions
 %                 rotate(self.JointEllipse(j), [0 0 1], Jrot(3), self.centreJoints{j});
 %                 rotate(self.JointEllipse(j), [0 1 0], Jrot(2), self.centreJoints{j});
 %                 rotate(self.JointEllipse(j), [1 0 0], Jrot(1), self.centreJoints{j});
-                
+%                 
                 
             end
-%              pause();
+%              pause(.2);
 %              delete(self.JointEllipse);
         end
 
@@ -182,7 +182,7 @@ classdef CollisionFunctions
             % outp = (point - centre)' * [XYZ Radii * I(3)] * (point - centre)
             tempAng = robot.model.getpos;
             [Tr, jointTr] = robot.model.fkine(tempAng);
-            self.updateEllips(robot);
+%             self.updateEllips(robot);
             if strcmp(robot.plyFileNameStem,'ColouredPanda')
                 self.jointX = .088;
                 self.jointY = .088;
@@ -197,20 +197,31 @@ classdef CollisionFunctions
                 
             end
             if strcmp(robot.plyFileNameStem,'LinearUR3')
-                self.jointX = .058;
-                self.jointY = .058;
+                self.jointX = .062;
+                self.jointY = .062;
                 gripXY = 4*0.0127;
                 gripZ = 0.0612;
-                self.linkLeng = [0 .128 .0435 .131 .2132 .0853 .131];
+                self.linkLeng = [.12 .158 .075 .111 .042 .0853 .031];
                 rote = jointTr(2).tr2rpy;
                 jointAdj = transl(self.centreJoints{2});
                 jointAdj = jointAdj*trotx(rote(1))*troty(rote(2))*trotz(rote(3))*transl(0, -0.12, 0);
                 self.centreJoints{2} = jointAdj(1:3, 4);
                 
             end
-            point = robot.model.fkine(Q)*SE3(transl(0,0,.15));
+            point = robot.model.fkineUTS(Q)*(transl(0,0,.15));
+            point1 = point*(transl(0,0.0127,0.2312));
+            point2 = point*(transl(0,-0.0127,0.2312));
+            pont = robot.model.fkineUTS(Q)*transl(0,0,.05);
+            pont = pont(1:3, 4);
+            point1 = point1(1:3, 4);
+            point2 = point2(1:3, 4);
+            grip1 = [linspace(pont(1), point1(1), 4)', linspace(pont(2), point1(2), 4)', linspace(pont(3), point1(3), 4)'];
+            grip2 = [linspace(pont(1), point2(1), 4)', linspace(pont(2), point2(2), 4)', linspace(pont(3), point2(3), 4)'];
+            grips = [grip1;grip2];
             endTr = SE3(point);
-            [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), .015, .015, .015);
+
+            [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), .025, .025, .025);
+            gripEll = [gripEllX(:), gripEllY(:), gripEllZ(:)]';
 %             showElp = surf(gripEllX, gripEllY, gripEllZ);
 %             Jrot = rad2deg(endTr.tr2rpy);
 %             rotate(showElp, [0 0 1], Jrot(3), [endTr.t(1), endTr.t(2), endTr.t(3)]);
@@ -218,14 +229,19 @@ classdef CollisionFunctions
 %             rotate(showElp, [1 0 0], Jrot(1), [endTr.t(1), endTr.t(2), endTr.t(3)]);
 %             pause(.3)
 %             delete(showElp)
-            for i = 1:length(self.centreJoints)-2
+            for i = 1:length(self.centreJoints)-1
                 % outp <= 1 is a collision
-                result = (point.t - self.centreJoints{i})' * ([self.jointX^-2, self.jointY^-2, self.linkLeng(i)^-2].*eye(3)) * (point.t - self.centreJoints{i});
-                if result <= 1
-                    
-                    outp = true; % Return true if collision detected
-                    return
+                for j = 1:length(grips)
+                    point = [grips(j, 1), grips(j, 2), grips(j, 3)]';
+                    result = (point - self.centreJoints{i})' * ([self.jointX^-2, self.jointY^-2, self.linkLeng(i)^-2].*eye(3)) * (point - self.centreJoints{i});
+                
+                    if result <= 1
+
+                        outp = true; % Return true if collision detected
+                        return
+                    end
                 end
+                
                 
             end
             outp = false;
@@ -247,22 +263,87 @@ classdef CollisionFunctions
             endTr = SE3(robot.model.fkine(endAn).T*transl(0,0, gripZ+.18)); % convert end effector angles to transform and move to end of gripper
 
             % Visualises the ellipsoid then deletes it
-%             [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), gripXY, gripXY, gripZ);
-%             showElp = surf(gripEllX, gripEllY, gripEllZ);
-%             Jrot = rad2deg(endTr.tr2rpy);
-%             rotate(showElp, [0 0 1], Jrot(3), [endTr.t(1), endTr.t(2), endTr.t(3)]);
-%             rotate(showElp, [0 1 0], Jrot(2), [endTr.t(1), endTr.t(2), endTr.t(3)]);
-%             rotate(showElp, [1 0 0], Jrot(1), [endTr.t(1), endTr.t(2), endTr.t(3)]);
-%             pause(.3)
-%             delete(showElp)
             if ~isrow(P)
                 P = P';
             end
             
             place = (P - endTr.t');
-            result = place * ([gripXY^-2, gripXY^-2, (5*gripZ)^-2].*eye(3)) * place';
+            result = place * ([gripXY^-2, gripXY^-2, (5*gripZ)^-2].*eye(3)) * place'
             if result <= 1
                 outp = true; % return true if collision detected
+                [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), gripXY, gripXY, gripZ);
+                showElp = surf(gripEllX, gripEllY, gripEllZ);
+                Jrot = rad2deg(endTr.tr2rpy);
+                rotate(showElp, [0 0 1], Jrot(3), [endTr.t(1), endTr.t(2), endTr.t(3)]);
+                rotate(showElp, [0 1 0], Jrot(2), [endTr.t(1), endTr.t(2), endTr.t(3)]);
+                rotate(showElp, [1 0 0], Jrot(1), [endTr.t(1), endTr.t(2), endTr.t(3)]);
+                pause(3)
+                delete(showElp)
+                return
+            end
+            outp = false;
+        end
+
+        function outp = collisionCheckCow(self, robot, cow) % check collision between end effector and point P
+            endAn = robot.model.getpos;
+            
+            cowPos = cow.model.base.T;
+            cowPos(3, 4) = cowPos(3, 4)+.3;
+            P = cowPos(1:3, 4);
+%             gripXY;
+%             gripZ;
+            if (strcmp(robot.plyFileNameStem, 'ColouredPanda'))
+%                 endTr = endAn(1:11);
+                gripXY = 5*0.0127;
+                gripZ = .05;
+            end
+            if (strcmp(robot.plyFileNameStem, 'LinearUR3'))
+                gripXY = 9*0.0127;
+                gripZ = 0.0612;
+            end
+            endTr = SE3(robot.model.fkine(endAn).T*transl(0,0, gripZ+.15)); % convert end effector angles to transform and move to end of gripper
+            if (strcmp(robot.plyFileNameStem, 'ColouredPanda'))
+                QAgrip1 = (robot.model.fkineUTS(robot.model.getpos()))* transl(0,-0.127,0.215);
+                QAgrip2 = (robot.model.fkineUTS(robot.model.getpos()))* transl(0,0.127,0.215);
+                point1 = [QAgrip1(1,4), QAgrip1(2,4), QAgrip1(3,4)];
+                point2 = [QAgrip2(1,4), QAgrip2(2,4), QAgrip2(3,4)];
+            end
+            if (strcmp(robot.plyFileNameStem, 'LinearUR3'))
+                harvestGrip1 = (robot.model.fkineUTS(robot.model.getpos()))*transl(0,0.127,0.2362);
+                harvestGrip2 = (robot.model.fkineUTS(robot.model.getpos()))*transl(0,-0.127,0.2362);
+                point1 = [harvestGrip1(1,4), harvestGrip1(2,4), harvestGrip1(3,4)];
+                point2 = [harvestGrip2(1,4), harvestGrip2(2,4), harvestGrip2(3,4)];
+            end
+
+            % Visualises the ellipsoid then deletes it
+            if ~isrow(P)
+                P = P';
+            end
+            if ~isrow(point1)
+                point1 = point1';
+            end
+            if ~isrow(point2)
+                point2 = point2';
+            end
+            place = (point1 - P);
+            result1 = place * ([.34^-2, .2^-2, (.22)^-2].*eye(3)) * place'
+            place = (point2 - P);
+            result2 = place * ([.34^-2, .2^-2, (.22)^-2].*eye(3)) * place'
+
+
+%             [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), gripXY, gripXY, gripZ);
+            place = (endTr.t' - P);
+            result = place * ([.34^-2, .2^-2, (.22)^-2].*eye(3)) * place'
+            if result <= 1 || result1 <= 1 || result2 <= 1
+                outp = true; % return true if collision detected
+%                 [gripEllX, gripEllY, gripEllZ] = ellipsoid(endTr.t(1), endTr.t(2), endTr.t(3), gripXY, gripXY, gripZ);
+%                 showElp = surf(gripEllX, gripEllY, gripEllZ);
+%                 Jrot = rad2deg(endTr.tr2rpy);
+%                 rotate(showElp, [0 0 1], Jrot(3), [endTr.t(1), endTr.t(2), endTr.t(3)]);
+%                 rotate(showElp, [0 1 0], Jrot(2), [endTr.t(1), endTr.t(2), endTr.t(3)]);
+%                 rotate(showElp, [1 0 0], Jrot(1), [endTr.t(1), endTr.t(2), endTr.t(3)]);
+%                 pause(3)
+%                 delete(showElp)
                 return
             end
             outp = false;
@@ -388,19 +469,22 @@ classdef CollisionFunctions
         function qMat = remakeTraj(self, robot, sideSteps, steps, q2)
             % using basic RRT
             poseA = robot.model.getpos();
-            planner = self.collisionCheckSelf(robot, poseA);
-            qRand = poseA + .25*(2 * rand(1,length(robot.model.links)) - 1) * pi;
+%             home = robot.homeQ - poseA;
+            
+            qRand = poseA + .11*(2 * rand(1,length(robot.model.links)) - 1) * pi/8;
+           
             if strcmp(robot.plyFileNameStem, 'LinearUR3')
-                qRand(1) = poseA(1) + (rand(1)-.5)*.05;
-            end
+                qRand(1) = poseA(1);
+            end 
+            planner = self.collisionCheckSelf(robot, qRand);
             trials = 0;
             while planner == true
-                qRand = poseA + .25*(2 * rand(1,length(robot.model.links)) - 1) * pi;
+                qRand = poseA + .11*(2 * rand(1,length(robot.model.links)) - 1) * pi/8;
                 if strcmp(robot.plyFileNameStem, 'LinearUR3')
-                    qRand(1) = poseA(1) + (rand(1)-.5)*.05;
+                    qRand(1) = poseA(1);
                 end
                 planner = self.collisionCheckSelf(robot, qRand);
-                trials = trials +1;
+                trials = trials +1
             end
             avoidPoseA = qRand;
             s1 = lspb(0,1,sideSteps);
